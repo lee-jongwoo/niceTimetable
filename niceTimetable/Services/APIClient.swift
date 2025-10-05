@@ -89,8 +89,6 @@ final class NEISAPIClient {
             return
         }
         
-        print("Fetching class list from URL: \(url.absoluteString)")
-        
         // Perform request
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {

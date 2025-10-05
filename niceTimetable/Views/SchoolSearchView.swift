@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 struct SchoolSearchView: View {
     @Environment(\.dismiss) var dismiss
@@ -167,12 +168,13 @@ struct SchoolSearchView: View {
                     vm.schoolCode = schoolCode
                     vm.grade = grade
                     vm.className = className
+                    CacheManager.shared.clearAll()
+                    WidgetCenter.shared.reloadAllTimelines()
                     dismiss()
                 }
                 .disabled(schoolName.isEmpty || grade.isEmpty || className.isEmpty)
                 .buttonStyle(.borderedProminent)
             }
-                
         }
     }
     

@@ -9,24 +9,28 @@ import SwiftUI
 import WidgetKit
 
 struct PreferencesView: View {
-    @StateObject private var vm = PreferencesViewModel()
     @State var showingSchoolSearch = false
+    @AppStorage("schoolType", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolType: String = "고등학교"
+    @AppStorage("officeCode", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var officeCode: String = ""
+    @AppStorage("schoolName", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolName: String = ""
+    @AppStorage("schoolCode", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolCode: String = ""
+    @AppStorage("grade", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var grade: String = ""
+    @AppStorage("className", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var className: String = ""
     
     var body: some View {
         List {
-            // TODO: Replace with dropdown
             Section(header: Text("학교 정보")) {
                 LabeledContent("학교 유형") {
-                    Text(vm.schoolType)
+                    Text(schoolType)
                 }
                 LabeledContent("학교 이름") {
-                    Text(vm.schoolName)
+                    Text(schoolName)
                 }
                 LabeledContent("학년") {
-                    Text(vm.grade)
+                    Text(grade)
                 }
                 LabeledContent("반") {
-                    Text(vm.className)
+                    Text(className)
                 }
                 Button {
                     showingSchoolSearch = true
@@ -59,9 +63,6 @@ struct PreferencesView: View {
             }
         }
         .navigationTitle("설정")
-        .onAppear {
-            vm.load()
-        }
     }
 }
 

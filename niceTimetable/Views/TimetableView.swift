@@ -17,7 +17,9 @@ struct TimetableView: View {
         NavigationStack {
             TabView(selection: $viewModel.currentWeekIndex) {
                 ForEach(-5...3, id: \.self) { offset in
-                    TimetableGridView(week: viewModel.weeks[offset] ?? TimetableWeek(days: [], weekInterval: offset))
+                    if let week = viewModel.weeks[offset] {
+                        TimetableGridView(week: week)
+                    }
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
