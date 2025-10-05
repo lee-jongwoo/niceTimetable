@@ -59,7 +59,7 @@ struct TimetableDetailsView: View {
                         dismiss()
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled((aliasLong == column.subject && aliasShort == (column.subject.firstMeaningfulCharacter.map { String($0) } ?? "") || (aliasLong.isEmpty && aliasShort.isEmpty)) )
+                    .disabled(aliasLong == aliasStore.aliases[column.subject]?.normal ?? "" && aliasShort == aliasStore.aliases[column.subject]?.compact ?? "")
                 }
                 
                 ToolbarItem(placement: .cancellationAction) {

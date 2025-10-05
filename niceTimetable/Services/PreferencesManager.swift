@@ -47,6 +47,10 @@ final class PreferencesManager {
     }
     
     func setAlias(for subject: String, normal: String, compact: String) {
+        if normal.isEmpty && compact.isEmpty {
+            removeAlias(for: subject)
+            return
+        }
         var current = aliasData
         current[subject] = AliasPair(normal: normal, compact: compact)
         aliasData = current
