@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		014ED2EB2E9268260022C8FF /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 014ED2EA2E9268260022C8FF /* .gitignore */; };
+		014ED2ED2E9269CB0022C8FF /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 014ED2EC2E9269CB0022C8FF /* README.md */; };
 		01C150B02E8C003B00D61252 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C150AF2E8C003B00D61252 /* WidgetKit.framework */; };
 		01C150B22E8C003C00D61252 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C150B12E8C003B00D61252 /* SwiftUI.framework */; };
 		01C150BD2E8C003D00D61252 /* basicWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 01C150AD2E8C003B00D61252 /* basicWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -39,6 +40,7 @@
 
 /* Begin PBXFileReference section */
 		014ED2EA2E9268260022C8FF /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		014ED2EC2E9269CB0022C8FF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		01C150AD2E8C003B00D61252 /* basicWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = basicWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		01C150AF2E8C003B00D61252 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		01C150B12E8C003B00D61252 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -129,6 +131,7 @@
 		01FEEE922E8BD23C00E91178 = {
 			isa = PBXGroup;
 			children = (
+				014ED2EC2E9269CB0022C8FF /* README.md */,
 				014ED2EA2E9268260022C8FF /* .gitignore */,
 				01C150C92E8C173500D61252 /* basicWidgetExtension.entitlements */,
 				01FEEE9D2E8BD23C00E91178 /* niceTimetable */,
@@ -240,6 +243,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				014ED2EB2E9268260022C8FF /* .gitignore in Resources */,
+				014ED2ED2E9269CB0022C8FF /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
