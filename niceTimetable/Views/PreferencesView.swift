@@ -124,7 +124,7 @@ struct AboutView: View {
                     - lee-jongwoo (jongwoo@jongwoo.dev)
                     
                     아직 저 말고는 목록에 사람이 없네요.
-                    이 앱은 오픈 소스로 공개되어 있습니다. 혹시 SwiftUI 개발에 관심이 있으시다면, [GitHub]()에서 niceTimetable 레포지토리를 확인해 보세요. PR 언제나 환영입니다.
+                    이 앱은 오픈 소스로 공개되어 있습니다. 혹시 SwiftUI 개발에 관심이 있으시다면, [GitHub](https://github.com/lee-jongwoo/niceTimetable)에서 niceTimetable 레포지토리를 확인해 보세요. PR 언제나 환영입니다.
                     """)
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -132,9 +132,8 @@ struct AboutView: View {
             
             Section(header: Text("라이선스")) {
                 Text("""
-                    놀랍게도 이 앱은 오픈 소스 라이브러리를 단 하나도 사용하지 않았습니다!
-                    제가 직접 만든 코드만 사용했어요.
-                    이 앱의 라이선스는 MIT 라이선스입니다.
+                    이 앱은 외부 오픈 소스 라이브러리를 사용하지 않았습니다.
+                    라이선스는 MIT 라이선스입니다.
                     """)
                     .font(.caption)
                     .foregroundColor(.secondary)
