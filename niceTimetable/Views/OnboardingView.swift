@@ -102,6 +102,7 @@ struct SetSchoolView: View {
     @State var showingSchoolSearch = true
     
     @State var schools: [School] = []
+    @State var classes: [SchoolClass] = []
     
     var body: some View {
         ScrollView {
@@ -114,6 +115,7 @@ struct SetSchoolView: View {
                     Image(systemName: showingSchoolSearch ? "chevron.up" : "chevron.down")
                         .foregroundStyle(.secondary)
                 }
+                .contentShape(Rectangle())
                 .onTapGesture {
                     withAnimation {
                         showingSchoolSearch = true
@@ -147,6 +149,7 @@ struct SetSchoolView: View {
                             officeCode = school.officeCode
                             schoolName = school.schoolName
                             schoolCode = school.schoolCode
+                            findClasses()
                             withAnimation {
                                 showingSchoolSearch = false
                             }
@@ -190,9 +193,14 @@ struct SetSchoolView: View {
                     }
                     
                     LabeledContent {
-                        TextField("입력", text: $grade)
-                            .multilineTextAlignment(.trailing)
-                            .keyboardType(.numberPad)
+                        Picker("학년", selection: $grade) {
+                            Text("선택").tag("")
+                            let grades = Array(Set(classes.map { $0.grade })).sorted()
+                            ForEach(grades, id: \.self) { grade in
+                                Text(grade).tag(grade)
+                            }
+                        }
+                        .pickerStyle(.menu)
                     } label: {
                         Text("학년")
                     }
@@ -201,13 +209,19 @@ struct SetSchoolView: View {
                     Divider()
                     
                     LabeledContent {
-                        TextField("입력", text: $className)
-                            .multilineTextAlignment(.trailing)
-                            .keyboardType(.numberPad)
+                        Picker("반", selection: $className) {
+                            Text("선택").tag("")
+                            let classNames = classes.filter { $0.grade == grade }.map { $0.className }
+                            ForEach(classNames, id: \.self) { className in
+                                Text(className).tag(className)
+                            }
+                        }
+                        .pickerStyle(.menu)
                     } label: {
                         Text("반")
                     }
                     .padding(.vertical, 4)
+                    
                 }
                 .padding()
                 .background {
@@ -255,6 +269,20 @@ struct SetSchoolView: View {
             case .failure(let error):
                 print("Error fetching schools: \(error)")
                 self.schools = []
+            }
+        }
+    }
+    
+    // TODO: Use some better async method
+    func findClasses() {
+        NEISAPIClient.shared.fetchClassList(officeCode: officeCode, schoolCode: schoolCode) { result in
+            switch result {
+            case .success(let classes):
+                self.classes = classes
+                print(classes)
+            case .failure(let error):
+                print("Error fetching classes: \(error)")
+                self.classes = []
             }
         }
     }

@@ -15,55 +15,29 @@ struct PreferencesView: View {
     var body: some View {
         List {
             // TODO: Replace with dropdown
-            Section(header: Text("학교 정보"), footer: Text("학교별 기재 상태에 따라, 반 앞에 0이 붙을 수 있습니다. (예: 01반) 마음 같아서는 드롭다운으로 바꾸고 싶지만, 몹시 귀찮으므로 당분간은 이대로 갑니다.")) {
-                Button(action: {
+            Section(header: Text("학교 정보")) {
+                LabeledContent("학교 유형") {
+                    Text(vm.schoolType)
+                }
+                LabeledContent("학교 이름") {
+                    Text(vm.schoolName)
+                }
+                LabeledContent("학년") {
+                    Text(vm.grade)
+                }
+                LabeledContent("반") {
+                    Text(vm.className)
+                }
+                Button {
                     showingSchoolSearch = true
-                }) {
-                    HStack {
-                        Text("학교 선택")
-                            .foregroundColor(Color(UIColor.label))
-                        Spacer()
-                        if !vm.schoolName.isEmpty {
-                            Text(vm.schoolName)
-                        }
-                    }
+                } label: {
+                    Label("변경하기", systemImage: "pencil")
                 }
                 .sheet(isPresented: $showingSchoolSearch) {
-                    NavigationView {
-                        SchoolSearchView(schoolType: $vm.schoolType, officeCode: $vm.officeCode, schoolName: $vm.schoolName, schoolCode: $vm.schoolCode)
-                            .navigationBarTitleDisplayMode(.inline)
-                            .toolbar {
-                                ToolbarItem(placement: .cancellationAction) {
-                                    Button("취소") {
-                                        showingSchoolSearch = false
-                                    }
-                                }
-                            }
+                    NavigationStack {
+                        SchoolSearchView()
                     }
                 }
-                
-                LabeledContent {
-                    TextField("학년", text: $vm.grade)
-                        .multilineTextAlignment(.trailing)
-                } label: {
-                    Text("학년")
-                }
-                
-                // TODO: 가끔 반 숫자 앞 0이 있는 경우가 있음. (ex: 01반)
-                // 그래서 드롭다운에서 고르도록 바꿀 예정.
-                LabeledContent {
-                    TextField("반", text: $vm.className)
-                        .multilineTextAlignment(.trailing)
-                } label: {
-                    Text("반")
-                }
-                
-                Button("저장") {
-                    vm.save()
-                }
-                .buttonStyle(.glassProminent)
-                .buttonBorderShape(.capsule)
-                .buttonSizing(.flexible)
             }
             
             Section(header: Text("과목 별칭"), footer: Text("과목 별칭을 추가하면 시간표에 표시되는 라벨을 변경할 수 있습니다.")) {
@@ -85,6 +59,9 @@ struct PreferencesView: View {
             }
         }
         .navigationTitle("설정")
+        .onAppear {
+            vm.load()
+        }
     }
 }
 
@@ -95,26 +72,7 @@ struct AboutView: View {
                 LabeledContent("버전", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown")
                 LabeledContent("빌드", value: Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown")
                 NavigationLink("고급") {
-                    List {
-                        Text("이 설정은 테스트 용도로 만들어 둔 것입니다. 뭐 건드려도 별일 없긴 합니다.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            
-                        Section(header: Text("저장공간"), footer: Text("아마도 제 캐시 관리 로직이 알아서 필요없는 캐시를 비우겠지만, 찝찝하시면 수동으로 비우셔도 좋습니다.")) {
-                            LabeledContent("캐시 크기") {
-                                Text("\(CacheManager.shared.cacheSize)")
-                            }
-                            Button("캐시 비우기") {
-                                CacheManager.shared.clearAll()
-                            }
-                        }
-                        
-                        Section(header: Text("위젯"), footer: Text("위젯을 강제로 새로고침합니다.")) {
-                            Button("갱신") {
-                                WidgetCenter.shared.reloadAllTimelines()
-                            }
-                        }
-                    }
+                    AdvancedInfoView()
                 }
             }
             
@@ -141,6 +99,85 @@ struct AboutView: View {
         }
         .navigationTitle("정보")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+struct AdvancedInfoView: View {
+    // TODO: This is aesthetically unpleasing...
+    @AppStorage("schoolType", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolType: String = "고등학교"
+    @AppStorage("officeCode", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var officeCode: String = ""
+    @AppStorage("schoolName", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolName: String = ""
+    @AppStorage("schoolCode", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolCode: String = ""
+    @AppStorage("grade", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var grade: String = ""
+    @AppStorage("className", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var className: String = ""
+    
+    var body: some View {
+        List {
+            Text("이 설정은 테스트 용도로 만들어 둔 것입니다. 뭐 건드려도 별일 없긴 합니다.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            Section(header: Text("학교 정보"), footer: Text("드롭다운에 뭔가 문제가 생겨서 반을 제대로 설정할 수 없을 때를 대비해 만들어 두었습니다.")) {
+                LabeledContent {
+                    Picker("학교 유형", selection: $schoolType) {
+                        Text("고등학교").tag("고등학교")
+                        Text("중학교").tag("중학교")
+                    }
+                } label: {
+                    Text("학교 유형")
+                }
+                
+                LabeledContent {
+                    TextField("교육청 코드", text: $officeCode)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Text("교육청 코드")
+                }
+                
+                LabeledContent {
+                    TextField("학교 이름", text: $schoolName)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Text("학교 이름")
+                }
+                
+                LabeledContent {
+                    TextField("학교 코드", text: $schoolCode)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Text("학교 코드")
+                }
+                
+                LabeledContent {
+                    TextField("학년", text: $grade)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Text("학년")
+                }
+                
+                LabeledContent {
+                    TextField("반", text: $className)
+                        .multilineTextAlignment(.trailing)
+                } label: {
+                    Text("반")
+                }
+            }
+            
+            Section(header: Text("저장공간"), footer: Text("아마도 제 캐시 관리 로직이 알아서 필요없는 캐시를 비우겠지만, 찝찝하시면 수동으로 비우셔도 좋습니다.")) {
+                LabeledContent("캐시 크기") {
+                    Text("\(CacheManager.shared.cacheSize)")
+                }
+                Button("캐시 비우기") {
+                    CacheManager.shared.clearAll()
+                }
+            }
+            
+            Section(header: Text("위젯"), footer: Text("위젯을 강제로 새로고침합니다.")) {
+                Button("갱신") {
+                    WidgetCenter.shared.reloadAllTimelines()
+                }
+            }
+        }
     }
 }
 

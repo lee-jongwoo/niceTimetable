@@ -65,6 +65,58 @@ final class NEISAPIClient {
         
     }
     
+    // MARK: - Class List Fetching
+    func fetchClassList(
+        officeCode: String,
+        schoolCode: String,
+        completion: @escaping (Result<[SchoolClass], Error>) -> Void
+    ) {
+        let academicYear = String(Calendar.current.component(.year, from: Date()))
+        
+        // Build query params
+        let baseURL = "https://open.neis.go.kr/hub/classInfo"
+        var components = URLComponents(string: baseURL)!
+        components.queryItems = [
+            URLQueryItem(name: "KEY", value: apiKey),
+            URLQueryItem(name: "Type", value: "json"),
+            URLQueryItem(name: "ATPT_OFCDC_SC_CODE", value: officeCode),
+            URLQueryItem(name: "SD_SCHUL_CODE", value: schoolCode),
+            URLQueryItem(name: "AY", value: academicYear)
+        ]
+        
+        guard let url = components.url else {
+            completion(.failure(URLError(.badURL)))
+            return
+        }
+        
+        print("Fetching class list from URL: \(url.absoluteString)")
+        
+        // Perform request
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async { completion(.failure(error)) }
+                return
+            }
+            guard let data = data else {
+                DispatchQueue.main.async { completion(.failure(URLError(.badServerResponse))) }
+                return
+            }
+            
+            DispatchQueue.main.async {
+                do {
+                    let decoded = try JSONDecoder().decode(ClassListAPIResponse.self, from: data)
+                    // Flatten to rows
+                    let rows = decoded.classInfo.flatMap { $0.row ?? [] }
+                    // Map to Class models
+                    let classes = rows.toClasses()
+                    completion(.success(classes))
+                } catch {
+                    completion(.failure(error))
+                }
+            }
+        }.resume()
+    }
+    
     // MARK: - Timetable Fetching
     func fetchTimetable(
         schoolType: String,

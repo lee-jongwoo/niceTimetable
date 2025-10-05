@@ -177,39 +177,3 @@ extension Array where Element == NEISRow {
         .sorted(by: { $0.date < $1.date })
     }
 }
-
-// Convert to School List
-extension Array where Element == SchoolRow {
-    func toSchools() -> [School] {
-        let rows = self.map { row in
-            School(
-                schoolType: row.SCHUL_KND_SC_NM,
-                schoolCode: row.SD_SCHUL_CODE,
-                schoolName: row.SCHUL_NM,
-                officeCode: row.ATPT_OFCDC_SC_CODE,
-                officeName: row.ATPT_OFCDC_SC_NM,
-                address: row.ORG_RDNMA ?? "주소 없음",
-                type: row.SCHUL_KND_SC_NM
-            )
-        }
-        // Remove duplicates by schoolCode
-        let schools = Dictionary(grouping: rows, by: { $0.schoolCode }).compactMap { $0.value.first }
-        // Sort by address first, then name
-        return schools.sorted {
-            if $0.officeCode == $1.officeCode {
-                return $0.schoolName < $1.schoolName
-            } else {
-                return $0.officeCode < $1.officeCode
-            }
-        }
-    }
-}
-
-extension String {
-    var firstMeaningfulCharacter: Character? {
-        let allowed = CharacterSet.letters.union(.decimalDigits)
-        return self.first { char in
-            char.unicodeScalars.allSatisfy { allowed.contains($0) }
-        }
-    }
-}

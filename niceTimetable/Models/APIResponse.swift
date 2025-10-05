@@ -55,6 +55,37 @@ struct SchoolRow: Codable {
     let LOAD_DTM: String?            // 수정일
 }
 
+// MARK: - Class List API Response
+struct ClassListAPIResponse: Codable {
+    let classInfo: [ClassContainer]
+}
+
+struct ClassContainer: Codable {
+    let head: [ClassHead]?
+    let row: [ClassRow]?
+}
+
+struct ClassHead: Codable {
+    let list_total_count: Int?
+    let RESULT: ClassResult?
+}
+
+struct ClassResult: Codable {
+    let CODE: String
+    let MESSAGE: String
+}
+
+struct ClassRow: Codable {
+    let ATPT_OFCDC_SC_CODE: String   // 교육청 코드
+    let ATPT_OFCDC_SC_NM: String     // 교육청명
+    let SD_SCHUL_CODE: String        // 학교 코드
+    let SCHUL_NM: String             // 학교명
+    let AY: String                   // 학년도
+    let GRADE: String                // 학년
+    let CLASS_NM: String             // 반
+    let LOAD_DTM: String?            // 수정일
+}
+
 // MARK: - Timetable API Response
 
 // Root NEIS timetable response
