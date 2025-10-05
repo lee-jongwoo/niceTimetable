@@ -12,13 +12,14 @@ struct TimetableView: View {
     
     var viewModes = ["작게", "크게"]
     @AppStorage("viewMode") private var viewMode: String = "작게"
+    @State var selectedItem: TimetableColumn? = nil
     
     var body: some View {
         NavigationStack {
             TabView(selection: $viewModel.currentWeekIndex) {
                 ForEach(-5...3, id: \.self) { offset in
                     if let week = viewModel.weeks[offset] {
-                        TimetableGridView(week: week)
+                        TimetableGridView(week: week, selectedItem: $selectedItem)
                     }
                 }
             }
@@ -67,6 +68,9 @@ struct TimetableView: View {
             .refreshable {
                 viewModel.checkForUpdates(weekInterval: viewModel.currentWeekIndex)
             }
+            .sheet(item: $selectedItem) { item in
+                TimetableDetailsView(column: item)
+            }
             .overlay {
                 if let error = viewModel.errorMessage {
                     Text(error)
@@ -82,6 +86,7 @@ struct TimetableView: View {
 struct TimetableGridView: View {
     let week: TimetableWeek
     var columns: [GridItem] = Array(repeating: .init(.flexible(), alignment: .top), count: 5)
+    @Binding var selectedItem: TimetableColumn?
     
     var body: some View {
         ScrollView {
@@ -92,7 +97,7 @@ struct TimetableGridView: View {
                             .font(.footnote)
                         
                         ForEach(day.columns) { column in
-                            TimetableItemView(column: column, isToday: Calendar.current.isDateInToday(day.date), dayLength: day.columns.count)
+                            TimetableItemView(column: column, isToday: Calendar.current.isDateInToday(day.date), dayLength: day.columns.count, selectedItem: $selectedItem)
                         }
                     }
                 }
@@ -110,6 +115,7 @@ struct TimetableItemView: View {
     let dayLength: Int
     @AppStorage("viewMode") private var viewMode: String = "작게"
     @EnvironmentObject var aliasStore: AliasStore
+    @Binding var selectedItem: TimetableColumn?
     
     var displayName: String {
         aliasStore.aliases[column.subject]?.normal.nonEmpty ?? column.subject
@@ -120,7 +126,9 @@ struct TimetableItemView: View {
     }
     
     var body: some View {
-        NavigationLink(destination: TimetableDetailsView(column: column)) {
+        Button {
+            selectedItem = column
+        } label: {
             if isToday {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(Color("AccentColor"))

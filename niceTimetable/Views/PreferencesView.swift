@@ -20,10 +20,10 @@ struct PreferencesView: View {
     var body: some View {
         List {
             Section(header: Text("학교 정보")) {
-                LabeledContent("학교 유형") {
+                LabeledContent("구분") {
                     Text(schoolType)
                 }
-                LabeledContent("학교 이름") {
+                LabeledContent("학교") {
                     Text(schoolName)
                 }
                 LabeledContent("학년") {
@@ -119,13 +119,9 @@ struct AdvancedInfoView: View {
                 .foregroundColor(.secondary)
             
             Section(header: Text("학교 정보"), footer: Text("드롭다운에 뭔가 문제가 생겨서 반을 제대로 설정할 수 없을 때를 대비해 만들어 두었습니다.")) {
-                LabeledContent {
-                    Picker("학교 유형", selection: $schoolType) {
-                        Text("고등학교").tag("고등학교")
-                        Text("중학교").tag("중학교")
-                    }
-                } label: {
-                    Text("학교 유형")
+                Picker("학교 유형", selection: $schoolType) {
+                    Text("고등학교").tag("고등학교")
+                    Text("중학교").tag("중학교")
                 }
                 
                 LabeledContent {

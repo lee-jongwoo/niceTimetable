@@ -207,4 +207,5 @@ struct SchoolSearchView: View {
 }
 
 #Preview {
+    SchoolSearchView()
 }
