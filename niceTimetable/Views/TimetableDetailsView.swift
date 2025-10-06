@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import StoreKit
 
 struct TimetableDetailsView: View {
     @EnvironmentObject var aliasStore: AliasStore
@@ -15,6 +16,8 @@ struct TimetableDetailsView: View {
     @State private var aliasShort: String = ""
     @State private var currentDetent: PresentationDetent = .medium
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("aliasSetCount") private var aliasSetCount: Int = 0
+    @Environment(\.requestReview) private var requestReview
     
     var body: some View {
         NavigationStack {
@@ -56,7 +59,12 @@ struct TimetableDetailsView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("저장", systemImage: "checkmark") {
                         aliasStore.setAlias(for: column.subject, normal: aliasLong, compact: aliasShort)
+                        aliasSetCount += 1
                         dismiss()
+                        
+                        if aliasSetCount == 5 {
+                            requestReview()
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(aliasLong == aliasStore.aliases[column.subject]?.normal ?? "" && aliasShort == aliasStore.aliases[column.subject]?.compact ?? "")

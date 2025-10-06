@@ -131,15 +131,6 @@ struct WidgetGridView: View {
         .mask {
             ContainerRelativeShape()
         }
-#if DEBUG
-        .overlay {
-            Text(entry.date, style: .time)
-                .font(.caption2)
-                .background {
-                    Color.yellow
-                }
-        }
-#endif
     }
 }
 
