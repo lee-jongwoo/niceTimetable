@@ -46,9 +46,6 @@ struct TimetableDetailsView: View {
                     LabeledContent("수정일", value: column.lastUpdated ?? "unknown")
                 }
             }
-            .scrollContentBackground(
-                currentDetent == .medium ? .hidden : .automatic
-            )
             .onAppear {
                 if let alias = aliasStore.aliases[column.subject] {
                     aliasLong = alias.normal
@@ -74,6 +71,15 @@ struct TimetableDetailsView: View {
                     Button("취소", systemImage: "xmark") {
                         dismiss()
                     }
+                }
+            }
+            .modify {
+                if #available(iOS 26, *) {
+                    $0.scrollContentBackground(
+                        currentDetent == .medium ? .hidden : .automatic
+                    )
+                } else {
+                    $0
                 }
             }
         }
