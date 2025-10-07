@@ -42,8 +42,8 @@ struct TimetableDetailsView: View {
                 Section(header: Text("상세 정보")) {
                     LabeledContent("교시", value: "\(column.period)교시")
                     LabeledContent("과목명", value: column.subject)
-                    LabeledContent("교실", value: column.room ?? "unknown")
-                    LabeledContent("수정일", value: column.lastUpdated ?? "unknown")
+                    LabeledContent("교실", value: column.room ?? "정보 없음")
+                    LabeledContent("수정일", value: column.lastUpdated ?? "정보 없음")
                 }
             }
             .onAppear {

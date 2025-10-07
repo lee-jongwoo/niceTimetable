@@ -10,19 +10,13 @@ import WidgetKit
 
 struct PreferencesView: View {
     @State var showingSchoolSearch = false
-    @AppStorage("schoolType", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolType: String = "고등학교"
-    @AppStorage("officeCode", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var officeCode: String = ""
     @AppStorage("schoolName", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolName: String = ""
-    @AppStorage("schoolCode", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolCode: String = ""
     @AppStorage("grade", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var grade: String = ""
     @AppStorage("className", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var className: String = ""
     
     var body: some View {
         List {
             Section(header: Text("학교 정보")) {
-                LabeledContent("구분") {
-                    Text(schoolType)
-                }
                 LabeledContent("학교") {
                     Text(schoolName)
                 }
@@ -113,7 +107,7 @@ struct AdvancedInfoView: View {
     @AppStorage("className", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var className: String = ""
     
     var body: some View {
-        List {
+        Form {
             Text("이 설정은 테스트 용도로 만들어 둔 것입니다. 뭐 건드려도 별일 없긴 합니다.")
                 .font(.caption)
                 .foregroundColor(.secondary)

@@ -16,8 +16,8 @@ struct AliasEditorView: View {
         Form {
             Section(header: Text("새 별칭 추가"), footer: Text("시간표의 과목을 탭하면 표시되는 상세 화면에서도 별칭을 편집할 수 있습니다.")) {
                 TextField("과목명", text: $subject)
-                TextField("기본 별칭", text: $normalAlias)
-                TextField("컴팩트 별칭", text: $compactAlias)
+                TextField("별칭", text: $normalAlias)
+                TextField("이니셜", text: $compactAlias)
                 Button("저장") {
                     guard !subject.isEmpty, !normalAlias.isEmpty, !compactAlias.isEmpty else { return }
                     PreferencesManager.shared.setAlias(for: subject, normal: normalAlias, compact: compactAlias)
