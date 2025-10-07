@@ -279,7 +279,6 @@ struct SetSchoolView: View {
             switch result {
             case .success(let classes):
                 self.classes = classes
-                print(classes)
             case .failure(let error):
                 print("Error fetching classes: \(error)")
                 self.classes = []

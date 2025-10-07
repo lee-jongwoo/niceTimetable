@@ -31,9 +31,6 @@ struct TimetableColumn: Identifiable, Codable, Equatable {
         lhs.room == rhs.room &&
         lhs.lastUpdated == rhs.lastUpdated
     }
-    
-    // Dummy data for testing
-    static let sample = TimetableColumn(period: 1, subject: "수학", room: "1", lastUpdated: "20231001")
 }
 
 extension String {
@@ -52,19 +49,7 @@ struct TimetableDay: Identifiable, Codable, Equatable {
         return lhs.date == rhs.date && lhs.columns == rhs.columns
     }
     
-    // TODO: remove before release
     // dummy data for testing
-    static let sample: TimetableDay = TimetableDay(
-        date: Date(),
-        columns: [
-            TimetableColumn(period: 1, subject: "수학", room: "101", lastUpdated: "20231001"),
-            TimetableColumn(period: 2, subject: "영어", room: "202", lastUpdated: "20231001"),
-            TimetableColumn(period: 3, subject: "과학", room: "303", lastUpdated: "20231001"),
-            TimetableColumn(period: 4, subject: "역사", room: "404", lastUpdated: "20231001"),
-            TimetableColumn(period: 5, subject: "체육", room: "505", lastUpdated: "20231001"),
-            TimetableColumn(period: 6, subject: "역사", room: "404", lastUpdated: "20231001"),
-            TimetableColumn(period: 7, subject: "체육", room: "505", lastUpdated: "20231001"),
-        ])
     static let sampleWeek: [TimetableDay] = [
         TimetableDay(
             date: Date(),

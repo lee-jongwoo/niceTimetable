@@ -83,5 +83,4 @@ struct TimetableDetailsView: View {
 }
 
 #Preview {
-    TimetableDetailsView(column: TimetableColumn.sample)
 }
