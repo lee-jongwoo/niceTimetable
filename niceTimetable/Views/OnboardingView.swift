@@ -55,8 +55,14 @@ struct WelcomeView: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.glassProminent)
             .controlSize(.extraLarge)
+            .modify {
+                if #available(iOS 26, *) {
+                    $0.buttonStyle(.glassProminent)
+                } else {
+                    $0.buttonStyle(.borderedProminent)
+                }
+            }
         }
         .padding()
     }
@@ -251,8 +257,14 @@ struct SetSchoolView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.glassProminent)
                 .controlSize(.extraLarge)
+                .modify {
+                    if #available(iOS 26, *) {
+                        $0.buttonStyle(.glassProminent)
+                    } else {
+                        $0.buttonStyle(.borderedProminent)
+                    }
+                }
             }
         }
         .padding()
@@ -284,6 +296,13 @@ struct SetSchoolView: View {
                 self.classes = []
             }
         }
+    }
+}
+
+// MARK: - Conditional View Modifier
+public extension View {
+    func modify(@ViewBuilder transform: (Self) -> some View) -> some View {
+        transform(self)
     }
 }
 
