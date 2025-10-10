@@ -13,6 +13,10 @@ struct CachedSchedule: Codable {
     let currentWeek: [TimetableDay]
 }
 
+extension UserDefaults {
+    static let appGroup = UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard
+}
+
 final class CacheManager {
     static let shared = CacheManager()
     private let defaults: UserDefaults

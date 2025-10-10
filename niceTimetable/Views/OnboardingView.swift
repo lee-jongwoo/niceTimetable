@@ -68,6 +68,7 @@ struct WelcomeView: View {
     }
 }
 
+// MARK: - Feature Cell (Subview)
 struct FeatureCell: View {
     var image: String
     var title: String
@@ -93,4 +94,8 @@ struct FeatureCell: View {
             Spacer()
         }
     }
+}
+
+#Preview {
+    OnboardingView()
 }

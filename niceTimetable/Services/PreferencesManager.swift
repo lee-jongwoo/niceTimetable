@@ -12,7 +12,7 @@ final class PreferencesManager {
     static let shared = PreferencesManager()
     private init() {}
     
-    private let defaults = UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard
+    private let defaults = UserDefaults.appGroup
     private let aliasesKey = "subjectAliases"
     
     private enum Keys {

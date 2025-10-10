@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TimetableView: View {
-    @StateObject private var viewModel = TimetableViewModel()
+    @StateObject private var model = TimetableViewModel()
     
     var viewModes = ["작게", "크게"]
     @AppStorage("viewMode") private var viewMode: String = "작게"
@@ -16,9 +16,9 @@ struct TimetableView: View {
     
     var body: some View {
         NavigationStack {
-            TabView(selection: $viewModel.currentWeekIndex) {
+            TabView(selection: $model.currentWeekIndex) {
                 ForEach(-5...3, id: \.self) { offset in
-                    if let week = viewModel.weeks[offset] {
+                    if let week = model.weeks[offset] {
                         TimetableGridView(week: week, selectedItem: $selectedItem)
                     }
                 }
@@ -42,10 +42,10 @@ struct TimetableView: View {
                     }
                 }
                 ToolbarItemGroup(placement: .bottomBar) {
-                    if (viewModel.currentWeekIndex < -1) || (viewModel.currentWeekIndex > 1) {
+                    if (model.currentWeekIndex < -1) || (model.currentWeekIndex > 1) {
                         Button(action: {
                             withAnimation {
-                                viewModel.currentWeekIndex = 0
+                                model.currentWeekIndex = 0
                             }
                         }) {
                             Text("오늘")
@@ -56,23 +56,27 @@ struct TimetableView: View {
                 }
             }
             .onAppear {
-                viewModel.loadThreeWeeks()
+                Task {
+                    await model.loadThreeWeeks()
+                }
             }
-            .onChange(of: viewModel.currentWeekIndex) {
-                viewModel.handleWeekChange(to: viewModel.currentWeekIndex)
+            .onChange(of: model.currentWeekIndex) {
+                Task {
+                    await model.handleWeekChange(to: model.currentWeekIndex)
+                }
             }
             .task {
-                viewModel.checkForUpdates() // Fetch for updated data
-                viewModel.clearOldCache()   // Remove old cache
+                await model.checkForUpdates() // Fetch for updated data
+                model.clearOldCache()   // Remove old cache
             }
             .refreshable {
-                viewModel.checkForUpdates(weekInterval: viewModel.currentWeekIndex)
+                await model.checkForUpdates(weekInterval: model.currentWeekIndex)
             }
             .sheet(item: $selectedItem) { item in
                 TimetableDetailsView(column: item)
             }
             .overlay {
-                if let error = viewModel.errorMessage {
+                if let error = model.errorMessage {
                     Text(error)
                         .padding()
                         .foregroundStyle(.red)
