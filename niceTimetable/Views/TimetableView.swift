@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TimetableView: View {
     @StateObject private var model = TimetableViewModel()
+    @StateObject private var aliasStore = AliasStore()
     
     var viewModes = ["작게", "크게"]
     @AppStorage("viewMode") private var viewMode: String = "작게"
@@ -20,6 +21,7 @@ struct TimetableView: View {
                 ForEach(-5...3, id: \.self) { offset in
                     if let week = model.weeks[offset] {
                         TimetableGridView(week: week, selectedItem: $selectedItem)
+                            .environmentObject(aliasStore)
                     }
                 }
             }
@@ -74,6 +76,7 @@ struct TimetableView: View {
             }
             .sheet(item: $selectedItem) { item in
                 TimetableDetailsView(column: item)
+                    .environmentObject(aliasStore)
             }
             .overlay {
                 if let error = model.errorMessage {
