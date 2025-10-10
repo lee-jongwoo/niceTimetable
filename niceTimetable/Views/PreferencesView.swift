@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import WidgetKit
 
 struct PreferencesView: View {
     @State var showingSchoolSearch = false
@@ -33,7 +32,7 @@ struct PreferencesView: View {
                 }
                 .sheet(isPresented: $showingSchoolSearch) {
                     NavigationStack {
-                        SchoolSearchView()
+                        SetSchoolView(isWelcomeScreen: false)
                     }
                 }
             }
@@ -165,7 +164,7 @@ struct AdvancedInfoView: View {
             
             Section(header: Text("위젯"), footer: Text("위젯을 강제로 새로고침합니다.")) {
                 Button("갱신") {
-                    WidgetCenter.shared.reloadAllTimelines()
+                    CacheManager.shared.reloadWidgets()
                 }
             }
         }

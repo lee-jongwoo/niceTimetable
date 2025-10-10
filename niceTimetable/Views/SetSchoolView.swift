@@ -1,27 +1,18 @@
 //
-//  SchoolSearchView.swift
+//  SetSchoolView.swift
 //  niceTimetable
 //
-//  Created by 이종우 on 10/1/25.
+//  Created by 이종우 on 10/10/25.
 //
 
 import SwiftUI
-import WidgetKit
 
-struct SchoolSearchView: View {
-    @Environment(\.dismiss) var dismiss
-    
-    @State var searchQuery: String = ""
-    @State var schoolType: String = "고등학교"
-    @State var officeCode: String = ""
-    @State var schoolName: String = ""
-    @State var schoolCode: String = ""
-    @State var grade: String = ""
-    @State var className: String = ""
+struct SetSchoolView: View {
+    let isWelcomeScreen: Bool
+    @AppStorage("isOnboarding") private var isOnboarding: Bool = true
+    @State private var model = SchoolSearcher()
     @State var showingSchoolSearch = true
-    
-    @State var schools: [School] = []
-    @State var classes: [SchoolClass] = []
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         ScrollView {
@@ -41,20 +32,24 @@ struct SchoolSearchView: View {
                     }
                 }
                 if showingSchoolSearch {
-                    Picker("학교 유형", selection: $schoolType) {
+                    Picker("학교 유형", selection: $model.schoolType) {
                         Text("고등학교").tag("고등학교")
                         Text("중학교").tag("중학교")
                     }.pickerStyle(SegmentedPickerStyle())
                     HStack {
-                        TextField("학교 이름으로 검색...", text: $searchQuery)
+                        TextField("학교 이름으로 검색...", text: $model.searchText)
                             .onSubmit {
-                                performSearch()
+                                Task {
+                                    await model.performSearch()
+                                }
                             }
                             .submitLabel(.go)
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(Color("AccentColor"))
                             .onTapGesture {
-                                performSearch()
+                                Task {
+                                    await model.performSearch()
+                                }
                             }
                     }
                     .padding()
@@ -62,13 +57,10 @@ struct SchoolSearchView: View {
                         Capsule()
                             .fill(.ultraThinMaterial)
                     }
-                    ForEach(schools, id: \.schoolCode) { school in
+                    ForEach(model.schools, id: \.schoolCode) { school in
                         Divider()
                         Button(action: {
-                            officeCode = school.officeCode
-                            schoolName = school.schoolName
-                            schoolCode = school.schoolCode
-                            findClasses()
+                            model.selectSchool(school)
                             withAnimation {
                                 showingSchoolSearch = false
                             }
@@ -79,18 +71,17 @@ struct SchoolSearchView: View {
                                     Text(school.address).font(.caption).foregroundColor(.secondary)
                                 }
                                 Spacer()
-                                if school.schoolCode == schoolCode {
+                                if model.selectedSchool?.schoolCode == school.schoolCode {
                                     Image(systemName: "checkmark")
                                 }
                             }
                             .padding(5)
                         }
-                        
                     }
                 } else {
                     Divider()
                     HStack {
-                        Text(schoolName)
+                        Text(model.selectedSchool?.schoolName ?? "선택된 학교 없음")
                             .foregroundStyle(.secondary)
                         Spacer()
                     }
@@ -102,7 +93,7 @@ struct SchoolSearchView: View {
                     .fill(.ultraThinMaterial)
             }
             
-            if !schoolName.isEmpty {
+            if model.selectedSchool != nil {
                 VStack {
                     HStack {
                         Text("학급 선택")
@@ -112,9 +103,9 @@ struct SchoolSearchView: View {
                     }
                     
                     LabeledContent {
-                        Picker("학년", selection: $grade) {
+                        Picker("학년", selection: $model.selectedGrade) {
                             Text("선택").tag("")
-                            let grades = Array(Set(classes.map { $0.grade })).sorted()
+                            let grades = Array(Set(model.classes.map { $0.grade })).sorted()
                             ForEach(grades, id: \.self) { grade in
                                 Text(grade).tag(grade)
                             }
@@ -128,9 +119,9 @@ struct SchoolSearchView: View {
                     Divider()
                     
                     LabeledContent {
-                        Picker("반", selection: $className) {
+                        Picker("반", selection: $model.selectedClass) {
                             Text("선택").tag("")
-                            let classNames = classes.filter { $0.grade == grade }.map { $0.className }
+                            let classNames = model.classes.filter { $0.grade == model.selectedGrade }.map { $0.className }
                             ForEach(classNames, id: \.self) { className in
                                 Text(className).tag(className)
                             }
@@ -148,64 +139,50 @@ struct SchoolSearchView: View {
                         .fill(.ultraThinMaterial)
                 }
             }
+            
+            
+            Spacer()
+            
+            if model.isComplete {
+                Button(action: {
+                    // Save to UserDefaults
+                    model.saveSchoolInfo()
+                    if isWelcomeScreen {
+                        withAnimation {
+                            self.isOnboarding = false
+                        }
+                    } else {
+                        // Dismiss the view
+                        dismiss()
+                        CacheManager.shared.clearAll()
+                    }
+                }) {
+                    Text(isWelcomeScreen ? "시작하기" : "저장하기")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                .controlSize(.extraLarge)
+                .modify {
+                    if #available(iOS 26, *) {
+                        $0.buttonStyle(.glassProminent)
+                    } else {
+                        $0.buttonStyle(.borderedProminent)
+                    }
+                }
+            }
         }
         .padding()
-        .animation(.default, value: className.isEmpty)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("취소", systemImage: "xmark") {
-                    dismiss()
-                }
-            }
-            
-            ToolbarItem(placement: .confirmationAction) {
-                Button("저장", systemImage: "checkmark") {
-                    // Save to UserDefaults
-                    let vm = PreferencesManager.shared
-                    vm.schoolType = schoolType
-                    vm.officeCode = officeCode
-                    vm.schoolName = schoolName
-                    vm.schoolCode = schoolCode
-                    vm.grade = grade
-                    vm.className = className
-                    CacheManager.shared.clearAll()
-                    WidgetCenter.shared.reloadAllTimelines()
-                    dismiss()
-                }
-                .disabled(schoolName.isEmpty || grade.isEmpty || className.isEmpty)
-                .buttonStyle(.borderedProminent)
-            }
-        }
+        .animation(.default, value: model.selectedClass)
     }
-    
-    func performSearch() {
-        NEISAPIClient.shared.fetchSchoolList(schoolName: searchQuery, schoolType: schoolType) { result in
-            switch result {
-            case .success(let schools):
-                withAnimation {
-                    self.schools = schools
-                }
-            case .failure(let error):
-                print("Error fetching schools: \(error)")
-                self.schools = []
-            }
-        }
-    }
-    
-    // TODO: Use some better async method
-    func findClasses() {
-        NEISAPIClient.shared.fetchClassList(officeCode: officeCode, schoolCode: schoolCode) { result in
-            switch result {
-            case .success(let classes):
-                self.classes = classes
-            case .failure(let error):
-                print("Error fetching classes: \(error)")
-                self.classes = []
-            }
-        }
+}
+
+// MARK: - Conditional View Modifier
+public extension View {
+    func modify(@ViewBuilder transform: (Self) -> some View) -> some View {
+        transform(self)
     }
 }
 
 #Preview {
-    SchoolSearchView()
+    SetSchoolView(isWelcomeScreen: true)
 }

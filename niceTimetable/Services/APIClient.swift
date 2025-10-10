@@ -7,6 +7,15 @@
 
 import Foundation
 
+// MARK: - Error Types
+enum NetworkingError: Error {
+    case encodingFailed(innerError: EncodingError)
+    case decodingFailed(innerError: DecodingError)
+    case invalidStatusCode(statusCode: Int)
+    case requestFailed(innerError: URLError)
+    case otherError(innerError: Error)
+}
+
 // A service for fetching timetables from NEIS
 final class NEISAPIClient {
     static let shared = NEISAPIClient()
@@ -18,6 +27,71 @@ final class NEISAPIClient {
     private let apiKey = "cbb9d435b84143d8aed60836da9cc6d3"
     
     // MARK: - School Search
+    
+    func searchSchools(for searchText: String, type: String) async throws -> [School] {
+        do {
+            var urlComponents = URLComponents(string: "https://open.neis.go.kr/hub/schoolInfo")!
+            let parameters: [String: String] = [
+                "KEY": apiKey,
+                "Type": "json",
+                "SCHUL_NM": searchText,
+                "SCHUL_KND_SC_NM": type
+            ]
+            urlComponents.queryItems = parameters.map { URLQueryItem(name: $0.key, value: $0.value) }
+            guard let url = urlComponents.url else {
+                throw URLError(.badURL)
+            }
+            
+            let (data, response) = try await URLSession.shared.data(from: url)
+            
+            guard let statusCode = (response as? HTTPURLResponse)?.statusCode, (200...299).contains(statusCode) else {
+                throw NetworkingError.invalidStatusCode(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1)
+            }
+            
+            let decoded = try JSONDecoder().decode(SchoolSearchAPIResponse.self, from: data)
+            let rows = decoded.schoolInfo.flatMap { $0.row ?? [] }
+            let schools = rows.toSchools()
+            return schools
+        } catch let encodingError as EncodingError {
+            throw NetworkingError.encodingFailed(innerError: encodingError)
+        } catch let decodingError as DecodingError {
+            throw NetworkingError.decodingFailed(innerError: decodingError)
+        } catch let urlError as URLError {
+            throw NetworkingError.requestFailed(innerError: urlError)
+        } catch {
+            throw NetworkingError.otherError(innerError: error)
+        }
+    }
+    
+    func fetchClasses(in selectedSchool: School) async throws -> [SchoolClass] {
+        do {
+            let academicYear = String(Calendar.current.component(.year, from: Date()))
+            var urlComponents = URLComponents(string: "https://open.neis.go.kr/hub/classInfo")!
+            let parameters: [String: String] = [
+                "KEY": apiKey,
+                "Type": "json",
+                "ATPT_OFCDC_SC_CODE": selectedSchool.officeCode,
+                "SD_SCHUL_CODE": selectedSchool.schoolCode,
+                "AY": academicYear
+            ]
+            urlComponents.queryItems = parameters.map { URLQueryItem(name: $0.key, value: $0.value) }
+            guard let url = urlComponents.url else {
+                throw URLError(.badURL)
+            }
+            
+            let (data, response) = try await URLSession.shared.data(from: url)
+            
+            guard let statusCode = (response as? HTTPURLResponse)?.statusCode, (200...299).contains(statusCode) else {
+                throw NetworkingError.invalidStatusCode(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1)
+            }
+            
+            let decoded = try JSONDecoder().decode(ClassListAPIResponse.self, from: data)
+            let rows = decoded.classInfo.flatMap { $0.row ?? [] }
+            let classes = rows.toClasses()
+            return classes
+        }
+    }
+    
     func fetchSchoolList(
         schoolName: String,
         schoolType: String = "고등학교",

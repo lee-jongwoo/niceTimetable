@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import WidgetKit
 
 struct CachedSchedule: Codable {
     let timestamp: Date
@@ -90,6 +91,11 @@ final class CacheManager {
                 defaults.removeObject(forKey: key)
             }
         }
+        reloadWidgets()
+    }
+    
+    func reloadWidgets() {
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }
 

@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 import SwiftUI
-import WidgetKit
 
 @MainActor
 class TimetableViewModel: ObservableObject {
@@ -64,7 +63,7 @@ class TimetableViewModel: ObservableObject {
                         // Update the widget!
                         // only if current week is updated
                         if weekInterval == 0 {
-                            WidgetCenter.shared.reloadAllTimelines()
+                            CacheManager.shared.reloadWidgets()
                         }
                     }
                 } else {

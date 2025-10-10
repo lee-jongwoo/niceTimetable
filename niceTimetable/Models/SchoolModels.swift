@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct School: Identifiable, Codable {
+struct School: Identifiable, Codable, Equatable {
     var id: String { schoolCode }
     let schoolType: String
     let schoolCode: String

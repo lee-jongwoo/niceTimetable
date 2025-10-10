@@ -92,4 +92,13 @@ final class PreferencesManager {
         get { defaults.string(forKey: Keys.className) }
         set { defaults.set(newValue, forKey: Keys.className) }
     }
+    
+    func setSchoolInfo(school: School, newClass: SchoolClass) {
+        self.schoolType = school.schoolType
+        self.officeCode = school.officeCode
+        self.schoolName = school.schoolName
+        self.schoolCode = school.schoolCode
+        self.grade = newClass.grade
+        self.className = newClass.className
+    }
 }

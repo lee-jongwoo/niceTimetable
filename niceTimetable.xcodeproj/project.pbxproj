@@ -69,6 +69,7 @@
 				AppIcon.icon,
 				Models/APIResponse.swift,
 				Models/SchoolModels.swift,
+				Models/SchoolSearcher.swift,
 				Models/TimetableModels.swift,
 				Services/AliasStore.swift,
 				Services/APIClient.swift,
