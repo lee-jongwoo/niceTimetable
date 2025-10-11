@@ -34,6 +34,37 @@ struct TimetableView: View {
                                     .refreshable {
                                         await model.checkForUpdates(weekInterval: model.currentWeekIndex ?? 0)
                                     }
+                            } else if let errorMsg = model.errorMessages[offset] {
+                                VStack {
+                                    if errorMsg == "tableNotRegistered" {
+                                        Image(systemName: "info.circle")
+                                            .font(.largeTitle)
+                                            .foregroundStyle(.secondary)
+                                        Text("시간표가 존재하지 않음")
+                                            .font(.headline)
+                                        Text("아직 학교에서 해당 기간의 시간표를 등록하지 않았을 수 있습니다.")
+                                            .font(.caption)
+                                            .multilineTextAlignment(.center)
+                                            .frame(maxWidth: 300)
+                                    } else {
+                                        Image(systemName: "exclamationmark.triangle")
+                                            .font(.largeTitle)
+                                            .foregroundStyle(.yellow)
+                                        Text("시간표를 불러올 수 없음")
+                                            .font(.headline)
+                                        Text(errorMsg)
+                                            .font(.caption)
+                                            .multilineTextAlignment(.center)
+                                            .frame(maxWidth: 300)
+                                    }
+                                }
+                                .padding()
+                                .background {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(.regularMaterial)
+                                }
+                                .id(offset)
+                                .containerRelativeFrame(.horizontal, count: 1, spacing: 0)
                             } else {
                                 // TODO: Replace with skeleton view
                                 ProgressView()
@@ -82,10 +113,8 @@ struct TimetableView: View {
                 }
             }
             .onAppear {
-                if model.weeks.isEmpty {
-                    Task {
-                        await model.loadThreeWeeks()
-                    }
+                Task {
+                    await model.loadThreeWeeks()
                 }
             }
             .onChange(of: model.currentWeekIndex) { _, newValue in
@@ -102,13 +131,6 @@ struct TimetableView: View {
             .sheet(item: $selectedItem) { item in
                 TimetableDetailsView(column: item)
                     .environmentObject(aliasStore)
-            }
-            .overlay {
-                if let error = model.errorMessage {
-                    Text(error)
-                        .padding()
-                        .foregroundStyle(.red)
-                }
             }
         }
     }

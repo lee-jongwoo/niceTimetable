@@ -13,7 +13,30 @@ enum NetworkingError: Error {
     case decodingFailed(innerError: DecodingError)
     case invalidStatusCode(statusCode: Int)
     case requestFailed(innerError: URLError)
+    case badConfiguration
+    case emptyData
     case otherError(innerError: Error)
+}
+
+extension NetworkingError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .encodingFailed(let inner):
+            return "인코딩 오류: \(inner.localizedDescription)"
+        case .decodingFailed(let inner):
+            return "디코딩 오류: \(inner.localizedDescription)"
+        case .invalidStatusCode(let code):
+            return "유효하지 않은 응답: \(code)"
+        case .requestFailed(let inner):
+            return "네트워크 요청 실패: \(inner.localizedDescription)"
+        case .badConfiguration:
+            return "학교 정보가 설정되지 않았습니다."
+        case .emptyData:
+            return "해당 기간의 시간표가 존재하지 않습니다."
+        case .otherError(let inner):
+            return "오류: \(inner.localizedDescription)"
+        }
+    }
 }
 
 // A service for fetching timetables from NEIS
@@ -57,6 +80,8 @@ final class NEISAPIClient {
             throw NetworkingError.decodingFailed(innerError: decodingError)
         } catch let urlError as URLError {
             throw NetworkingError.requestFailed(innerError: urlError)
+        } catch NetworkingError.emptyData {
+            throw NetworkingError.emptyData
         } catch {
             throw NetworkingError.otherError(innerError: error)
         }
@@ -95,6 +120,8 @@ final class NEISAPIClient {
             throw NetworkingError.decodingFailed(innerError: decodingError)
         } catch let urlError as URLError {
             throw NetworkingError.requestFailed(innerError: urlError)
+        } catch NetworkingError.emptyData {
+            throw NetworkingError.emptyData
         } catch {
             throw NetworkingError.otherError(innerError: error)
         }
@@ -145,7 +172,7 @@ final class NEISAPIClient {
             // Map to days
             let days = rows.toTimetableDays()
             if days.isEmpty {
-                throw NSError(domain: "NEISAPIClient", code: 2, userInfo: [NSLocalizedDescriptionKey: "해당 기간에 수업이 없습니다."])
+                throw NetworkingError.emptyData
             }
             // Insert empty days for missing weekdays in the requested range (e.g., holidays)
             let padded = self.padDays(days, from: startDate, to: endDate)
@@ -156,6 +183,8 @@ final class NEISAPIClient {
             throw NetworkingError.decodingFailed(innerError: decodingError)
         } catch let urlError as URLError {
             throw NetworkingError.requestFailed(innerError: urlError)
+        } catch NetworkingError.emptyData {
+            throw NetworkingError.emptyData
         } catch {
             throw NetworkingError.otherError(innerError: error)
         }
@@ -179,7 +208,7 @@ final class NEISAPIClient {
             let grade = PreferencesManager.shared.grade,
             let className = PreferencesManager.shared.className
         else {
-            throw NSError(domain: "NEISAPIClient", code: 1, userInfo: [NSLocalizedDescriptionKey: "학교 정보가 설정되지 않았습니다."])
+            throw NetworkingError.badConfiguration
         }
         
         let baseDate = Date().addingTimeInterval(TimeInterval(weekInterval * 7 * 24 * 60 * 60))
