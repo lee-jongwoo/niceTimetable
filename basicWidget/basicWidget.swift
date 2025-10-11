@@ -119,7 +119,7 @@ struct WidgetGridView: View {
             ForEach(entry.data) { day in
                 VStack(spacing: 1) {
                     ForEach(day.columns) { column in
-                        WidgetDailyItemView(column: column, itemAspectRatio: itemAspectRatio, isToday: Calendar.current.isDateInToday(day.date))
+                        WidgetDailyItemView(column: column, itemAspectRatio: itemAspectRatio, isToday: PreferencesManager.shared.isToday(day.date))
                     }
                 }
             }

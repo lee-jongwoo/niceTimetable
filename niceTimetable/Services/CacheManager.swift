@@ -102,14 +102,3 @@ final class CacheManager {
         WidgetCenter.shared.reloadAllTimelines()
     }
 }
-
-// MARK: - Extensions
-extension Date {
-    func weekIdentifier() -> String {
-        let calendar = Calendar(identifier: .gregorian)
-        let monday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: monday) // e.g. "2025-06-09"
-    }
-}

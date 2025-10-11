@@ -17,16 +17,40 @@ struct TimetableView: View {
     
     var body: some View {
         NavigationStack {
-            TabView(selection: $model.currentWeekIndex) {
-                ForEach(-5...3, id: \.self) { offset in
-                    if let week = model.weeks[offset] {
-                        TimetableGridView(week: week, selectedItem: $selectedItem)
-                            .environmentObject(aliasStore)
+            VStack(alignment: .leading) {
+                // I'm really sorry, but using NavigationTitle here is really buggy with those nested scroll views.
+                Text("시간표")
+                    .font(.largeTitle)
+                    .bold()
+                    .padding()
+                ScrollView(.horizontal) {
+                    LazyHStack(spacing: 0) {
+                        ForEach(-5...3, id: \.self) { offset in
+                            if let week = model.weeks[offset] {
+                                TimetableGridView(week: week, selectedItem: $selectedItem)
+                                    .environmentObject(aliasStore)
+                                    .id(offset)
+                                    .containerRelativeFrame(.horizontal, count: 1, spacing: 0)
+                                    .refreshable {
+                                        await model.checkForUpdates(weekInterval: model.currentWeekIndex ?? 0)
+                                    }
+                            } else {
+                                // TODO: Replace with skeleton view
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .id(offset)
+                                    .containerRelativeFrame(.horizontal, count: 1, spacing: 0)
+                            }
+                        }
                     }
+                    .scrollTargetLayout()
                 }
+                .scrollTargetBehavior(.paging)
+                .scrollIndicators(.hidden)
+                .scrollPosition(id: $model.currentWeekIndex, anchor: .center)
+                
+                Spacer()
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .navigationTitle("시간표")
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     NavigationLink(destination: PreferencesView()) {
@@ -44,7 +68,7 @@ struct TimetableView: View {
                     }
                 }
                 ToolbarItemGroup(placement: .bottomBar) {
-                    if (model.currentWeekIndex < -1) || (model.currentWeekIndex > 1) {
+                    if (model.currentWeekIndex != 0) {
                         Button(action: {
                             withAnimation {
                                 model.currentWeekIndex = 0
@@ -58,21 +82,22 @@ struct TimetableView: View {
                 }
             }
             .onAppear {
-                Task {
-                    await model.loadThreeWeeks()
+                if model.weeks.isEmpty {
+                    Task {
+                        await model.loadThreeWeeks()
+                    }
                 }
             }
-            .onChange(of: model.currentWeekIndex) {
-                Task {
-                    await model.handleWeekChange(to: model.currentWeekIndex)
+            .onChange(of: model.currentWeekIndex) { _, newValue in
+                if let newValue {
+                    Task {
+                        await model.handleWeekChange(to: newValue)
+                    }
                 }
             }
             .task {
                 await model.checkForUpdates() // Fetch for updated data
                 model.clearOldCache()   // Remove old cache
-            }
-            .refreshable {
-                await model.checkForUpdates(weekInterval: model.currentWeekIndex)
             }
             .sheet(item: $selectedItem) { item in
                 TimetableDetailsView(column: item)
@@ -100,11 +125,11 @@ struct TimetableGridView: View {
             LazyVGrid(columns: columns) {
                 ForEach(week.days) { day in
                     VStack {
-                        Text(day.date.formatted(.dateTime.month(.defaultDigits).day(.defaultDigits)))
+                        Text(DateFormatters.monthDay.string(from: day.date))
                             .font(.footnote)
                         
                         ForEach(day.columns) { column in
-                            TimetableItemView(column: column, isToday: Calendar.current.isDateInToday(day.date), dayLength: day.columns.count, selectedItem: $selectedItem)
+                            TimetableItemView(column: column, isToday: PreferencesManager.shared.isToday(day.date), dayLength: day.columns.count, selectedItem: $selectedItem)
                         }
                     }
                 }
@@ -112,7 +137,6 @@ struct TimetableGridView: View {
             .frame(maxWidth: 500)
             .padding()
         }
-        .tag(week.weekInterval)
     }
 }
 

@@ -50,9 +50,10 @@ struct TimetableDay: Identifiable, Codable, Equatable {
     }
     
     // dummy data for testing
+    static let startOfWeek = PreferencesManager.shared.startOfWeek(for: Date())
     static let sampleWeek: [TimetableDay] = [
         TimetableDay(
-            date: Date(),
+            date: startOfWeek.next(.monday),
             columns: [
                 TimetableColumn(period: 1, subject: "수학", room: "101", lastUpdated: "20231001"),
                 TimetableColumn(period: 2, subject: "영어", room: "202", lastUpdated: "20231001"),
@@ -63,7 +64,7 @@ struct TimetableDay: Identifiable, Codable, Equatable {
                 TimetableColumn(period: 7, subject: "체육", room: "505", lastUpdated: "20231001"),
             ]),
         TimetableDay(
-            date: Calendar.current.date(byAdding: .day, value: 1, to: Date())!,
+            date: startOfWeek.next(.tuesday),
             columns: [
                 TimetableColumn(period: 1, subject: "국어", room: "101", lastUpdated: "20231001"),
                 TimetableColumn(period: 2, subject: "영어", room: "202", lastUpdated: "20231001"),
@@ -73,7 +74,7 @@ struct TimetableDay: Identifiable, Codable, Equatable {
                 TimetableColumn(period: 6, subject: "미술", room: "404", lastUpdated: "20231001"),
             ]),
         TimetableDay(
-            date: Calendar.current.date(byAdding: .day, value: 2, to: Date())!,
+            date: startOfWeek.next(.wednesday),
             columns: [
                 TimetableColumn(period: 1, subject: "국어", room: "101", lastUpdated: "20231001"),
                 TimetableColumn(period: 2, subject: "영어", room: "202", lastUpdated: "20231001"),
@@ -84,7 +85,7 @@ struct TimetableDay: Identifiable, Codable, Equatable {
                 TimetableColumn(period: 7, subject: "체육", room: "505", lastUpdated: "20231001"),
             ]),
         TimetableDay(
-            date: Calendar.current.date(byAdding: .day, value: 3, to: Date())!,
+            date: startOfWeek.next(.thursday),
             columns: [
                 TimetableColumn(period: 1, subject: "국어", room: "101", lastUpdated: "20231001"),
                 TimetableColumn(period: 2, subject: "영어", room: "202", lastUpdated: "20231001"),
@@ -94,7 +95,7 @@ struct TimetableDay: Identifiable, Codable, Equatable {
                 TimetableColumn(period: 6, subject: "미술", room: "404", lastUpdated: "20231001"),
             ]),
         TimetableDay(
-            date: Calendar.current.date(byAdding: .day, value: 4, to: Date())!,
+            date: startOfWeek.next(.friday),
             columns: [
                 TimetableColumn(period: 1, subject: "국어", room: "101", lastUpdated: "20231001"),
                 TimetableColumn(period: 2, subject: "영어", room: "202", lastUpdated: "20231001"),
@@ -127,9 +128,7 @@ extension Array where Element == NEISRow {
         
         return grouped.compactMap { (dateString, rows) in
             // Parse date
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyyMMdd"
-            guard let date = formatter.date(from: dateString) else { return nil }
+            guard let date = DateFormatters.timeStamp.date(from: dateString) else { return nil }
             
             // Convert rows → TimetableColumn while removing duplicates by period
             var dayRowsDict: [Int: TimetableColumn] = [:]

@@ -14,10 +14,12 @@ class TimetableViewModel: ObservableObject {
     // Adding pagination: now user can swipe through weeks
     @Published var weeks: [Int: TimetableWeek] = [:]
     @Published var errorMessage: String?
-    @Published var currentWeekIndex: Int = 0    // Track which week is currently displayed
+    @Published var currentWeekIndex: Int? = 0    // Track which week is currently displayed
     @Published var loadedWeekIndices: [Int] = [] // Track which weeks have been loaded
+    @Published var loadingWeekIndices: Set<Int> = [] // Track which weeks are currently being loaded
     
     func loadThreeWeeks() async {
+        loadingWeekIndices = [-1, 0, 1]
         // Load previous, current, and next week
         async let lastWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: -1)
         async let thisWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 0)
@@ -83,6 +85,7 @@ class TimetableViewModel: ObservableObject {
         if newIndex == (loadedWeekIndices.min() ?? 0) {
             // Load previous week
             let newWeekOffset = newIndex - 1
+            loadingWeekIndices.insert(newWeekOffset)
             do {
                 let days = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: newWeekOffset)
                 let newWeek = TimetableWeek(days: days, weekInterval: newWeekOffset)
@@ -95,6 +98,7 @@ class TimetableViewModel: ObservableObject {
         } else if newIndex == (loadedWeekIndices.max() ?? 0) {
             // Load next week
             let newWeekOffset = newIndex + 1
+            loadingWeekIndices.insert(newWeekOffset)
             do {
                 let days = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: newWeekOffset)
                 let newWeek = TimetableWeek(days: days, weekInterval: newWeekOffset)

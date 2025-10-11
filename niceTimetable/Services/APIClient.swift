@@ -112,10 +112,8 @@ final class NEISAPIClient {
     ) async throws -> [TimetableDay] {
         do {
             // Format dates (yyyyMMdd)
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyyMMdd"
-            let start = formatter.string(from: startDate)
-            let end = formatter.string(from: endDate)
+            let start = DateFormatters.timeStamp.string(from: startDate)
+            let end = DateFormatters.timeStamp.string(from: endDate)
             
             // Build query params
             let baseURL = (schoolType == "고등학교") ? "https://open.neis.go.kr/hub/hisTimetable" : "https://open.neis.go.kr/hub/misTimetable"
