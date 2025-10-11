@@ -82,7 +82,7 @@ class TimetableViewModel: ObservableObject {
         
         if newIndex == (loadedWeekIndices.min() ?? 0) {
             // Load previous week
-            let newWeekOffset = (loadedWeekIndices.min() ?? 0) - 1
+            let newWeekOffset = newIndex - 1
             do {
                 let days = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: newWeekOffset)
                 let newWeek = TimetableWeek(days: days, weekInterval: newWeekOffset)
@@ -94,7 +94,7 @@ class TimetableViewModel: ObservableObject {
             }
         } else if newIndex == (loadedWeekIndices.max() ?? 0) {
             // Load next week
-            let newWeekOffset = (loadedWeekIndices.max() ?? 0) + 1
+            let newWeekOffset = newIndex + 1
             do {
                 let days = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: newWeekOffset)
                 let newWeek = TimetableWeek(days: days, weekInterval: newWeekOffset)

@@ -25,6 +25,27 @@ final class PreferencesManager {
         static let aliases = "subjectAliases"
     }
     
+    // MARK: - Date Control Functions
+    // Not currenly customizable, but might be in the future
+    func startOfWeek(for date: Date) -> Date {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date)
+        return calendar.date(from: components) ?? date
+    }
+    
+    func weekdayTimeFrame(for date: Date) -> (start: Date, end: Date) {
+        let startOfWeek = self.startOfWeek(for: date)
+        // Find Monday after startOfWeek (which may be Sunday)
+        let start = startOfWeek.next(.monday, considerToday: true)
+        let end = startOfWeek.next(.friday, considerToday: true)
+        return (start, end)
+    }
+    
+    // May change start time of day in the future
+    func isToday(_ date: Date) -> Bool {
+        Calendar.current.isDateInToday(date)
+    }
+    
     // MARK: - Subject Aliases
     
     private var aliasData: [String: AliasPair] {
@@ -101,4 +122,31 @@ final class PreferencesManager {
         self.grade = newClass.grade
         self.className = newClass.className
     }
+}
+
+// MARK: - Extensions
+extension Date {
+    public func next(_ weekday: Weekday,
+                     direction: Calendar.SearchDirection = .forward,
+                     considerToday: Bool = false) -> Date
+    {
+        let calendar = Calendar(identifier: .gregorian)
+        let components = DateComponents(weekday: weekday.rawValue)
+        
+        if considerToday &&
+            calendar.component(.weekday, from: self) == weekday.rawValue
+        {
+            return self
+        }
+        
+        return calendar.nextDate(after: self,
+                                 matching: components,
+                                 matchingPolicy: .nextTime,
+                                 direction: direction)!
+    }
+    
+    public enum Weekday: Int {
+        case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
+    }
+    
 }

@@ -89,7 +89,7 @@ struct ClassRow: Codable {
 // MARK: - Timetable API Response
 
 // Root NEIS timetable response
-struct NEISAPIResponse: Decodable {
+struct NEISAPIResponse: Decodable, Sendable {
     let hisTimetable: [TimetableContainer]
 
     private enum CodingKeys: String, CodingKey {

@@ -21,9 +21,9 @@ final class NEISAPIClient {
     static let shared = NEISAPIClient()
     private init() {}
     
-    // 원래는 따로 빼서 유출되지 않도록 해야 되는데,
-    // 혹시라도 오픈소스 개발에 참여할 여러분의 수고를 덜기 위해
-    // 걍 냅둡니다. 이걸로 나쁜 짓은 하지 말아 주세요.
+    /// 원래는 따로 빼서 유출되지 않도록 해야 되는데,
+    /// 혹시라도 오픈소스 개발에 참여할 여러분의 수고를 덜기 위해
+    /// 걍 냅둡니다. 이걸로 나쁜 짓은 하지 말아 주세요.
     private let apiKey = "cbb9d435b84143d8aed60836da9cc6d3"
     
     // MARK: - School Search
@@ -166,9 +166,7 @@ final class NEISAPIClient {
     // MARK: - Batch Fetching
     func fetchCachedWeeklyTable(weekInterval: Int = 0) -> [TimetableDay]? {
         let baseDate = Date().addingTimeInterval(TimeInterval(weekInterval * 7 * 24 * 60 * 60))
-        // Find Monday
-        let startOfWeek = Calendar.current.date(from: Calendar.current.dateComponents([.yearForWeekOfYear, .weekOfYear], from: baseDate))!
-        let weekKey = startOfWeek.weekIdentifier()
+        let weekKey = PreferencesManager.shared.startOfWeek(for: baseDate).weekIdentifier()
         return CacheManager.shared.get(for: weekKey, maxAge: 2 * 60 * 60)
     }
         
@@ -187,11 +185,7 @@ final class NEISAPIClient {
         }
         
         let baseDate = Date().addingTimeInterval(TimeInterval(weekInterval * 7 * 24 * 60 * 60))
-        
-        // Find Monday
-        let startOfWeek = Calendar.current.date(from: Calendar.current.dateComponents([.yearForWeekOfYear, .weekOfYear], from: baseDate))!
-        // Find Friday
-        let endOfWeek = Calendar.current.date(byAdding: .day, value: 5, to: startOfWeek)!
+        let (startOfWeek, endOfWeek) = PreferencesManager.shared.weekdayTimeFrame(for: baseDate)
         
         // Check cache first
         let weekKey = startOfWeek.weekIdentifier()
@@ -213,6 +207,7 @@ final class NEISAPIClient {
         return result
     }
     
+    // TODO: This should not rely on the user's calendar settings
     // Fill missing weekdays between start and end with empty TimetableDay entries
     private func padDays(_ days: [TimetableDay], from startDate: Date, to endDate: Date) -> [TimetableDay] {
         let cal = Calendar.current
