@@ -18,12 +18,20 @@ struct niceTimetableApp: App {
 
 struct RootView: View {
     @AppStorage("isOnboarding") private var isOnboarding: Bool = true
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
         if isOnboarding {
             OnboardingView()
         } else {
             TimetableView()
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .background {
+                        if PreferencesManager.shared.shouldUpdateWidget {
+                            CacheManager.shared.reloadWidgets()
+                        }
+                    }
+                }
         }
     }
 }

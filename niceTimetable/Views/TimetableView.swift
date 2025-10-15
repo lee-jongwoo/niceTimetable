@@ -82,6 +82,7 @@ struct TimetableView: View {
                 
                 Spacer()
             }
+            .ignoresSafeArea(edges: .bottom)
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     NavigationLink(destination: PreferencesView()) {

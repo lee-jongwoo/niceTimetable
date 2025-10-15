@@ -178,7 +178,7 @@ struct WidgetDailyItemView: View {
             switch renderingMode {
             case .fullColor:
                 RoundedRectangle(cornerRadius: 3)
-                    .fill(.gray.opacity(0.2))
+                    .fill(.gray.opacity(0.15))
                     .aspectRatio(itemAspectRatio, contentMode: .fit)
                     .overlay {
                         Text(family == .systemMedium ? column.displayName : column.compactDisplayName)
@@ -192,7 +192,6 @@ struct WidgetDailyItemView: View {
                     .overlay {
                         Text(family == .systemMedium ? column.displayName : column.compactDisplayName)
                             .foregroundStyle(Color(UIColor.label))
-                            .bold()
                             .minimumScaleFactor(0.5)
                     }
             default:

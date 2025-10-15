@@ -32,7 +32,7 @@ struct TimetableDetailsView: View {
                 }
                 
                 Section(header: Text("이니셜"), footer: Text("작은 화면에서는 별칭 대신 한 글자의 이니셜이 사용됩니다.")) {
-                    TextField(String(column.subject.firstMeaningfulCharacter.map { String($0) } ?? ""), text: $aliasShort, onEditingChanged: { began in
+                    TextField(String(aliasLong.firstMeaningfulCharacter.map { String($0) } ?? column.subject.firstMeaningfulCharacter.map { String($0) } ?? ""), text: $aliasShort, onEditingChanged: { began in
                         if began {
                             currentDetent = .large
                         }
@@ -55,7 +55,7 @@ struct TimetableDetailsView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("저장", systemImage: "checkmark") {
-                        aliasStore.setAlias(for: column.subject, normal: aliasLong, compact: aliasShort)
+                        aliasStore.setAlias(for: column.subject, normal: aliasLong, compact: String(aliasShort.prefix(1)))
                         aliasSetCount += 1
                         dismiss()
                         

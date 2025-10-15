@@ -22,7 +22,13 @@ struct TimetableColumn: Identifiable, Codable, Equatable {
     
     // Use the compact alias if not blank, otherwise fallback to the first character of the subject
     var compactDisplayName: String {
-        PreferencesManager.shared.aliases[subject]?.compact.isEmpty == false ? PreferencesManager.shared.aliases[subject]!.compact : subject.firstMeaningfulCharacter.map { String($0) } ?? subject
+        if PreferencesManager.shared.aliases[subject]?.compact.isEmpty == false {
+            return PreferencesManager.shared.aliases[subject]!.compact
+        } else if let ini = PreferencesManager.shared.aliases[subject]?.normal.firstMeaningfulCharacter.map({ String($0) }) {
+            return ini
+        } else {
+            return subject.firstMeaningfulCharacter.map { String($0) } ?? "-"
+        }
     }
     
     static func == (lhs: TimetableColumn, rhs: TimetableColumn) -> Bool {

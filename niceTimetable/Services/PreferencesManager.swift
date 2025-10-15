@@ -23,6 +23,8 @@ final class PreferencesManager {
         static let grade = "grade"
         static let className = "className"
         static let aliases = "subjectAliases"
+        static let daySwitchTime = "daySwitchTime"
+        static let shouldUpdateWidget = "shouldUpdateWidget"
     }
     
     // MARK: - Date Control Functions
@@ -43,7 +45,25 @@ final class PreferencesManager {
     
     // May change start time of day in the future
     func isToday(_ date: Date) -> Bool {
-        Calendar.current.isDateInToday(date)
+        if daySwitchTime != (0,0) {
+            // if day switch time is past, consider it next day
+            let now = Date()
+            let calendar = Calendar.current
+            var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: now)
+            components.hour = daySwitchTime.hour
+            components.minute = daySwitchTime.minute
+            components.second = 0
+            let switchTimeToday = calendar.date(from: components)!
+            if now >= switchTimeToday {
+                // consider it next day
+                let tomorrow = calendar.date(byAdding: .day, value: 1, to: now)!
+                return calendar.isDate(tomorrow, inSameDayAs: date)
+            } else {
+                return calendar.isDate(now, inSameDayAs: date)
+            }
+        } else {
+            return Calendar.current.isDateInToday(date)
+        }
     }
     
     // MARK: - Subject Aliases
@@ -75,6 +95,7 @@ final class PreferencesManager {
         var current = aliasData
         current[subject] = AliasPair(normal: normal, compact: compact)
         aliasData = current
+        shouldUpdateWidget = true
     }
     
     func removeAlias(for subject: String) {
@@ -121,5 +142,38 @@ final class PreferencesManager {
         self.schoolCode = school.schoolCode
         self.grade = newClass.grade
         self.className = newClass.className
+    }
+    
+    // MARK: - Day Switch Time
+    var daySwitchTime: (hour: Int, minute: Int) {
+        get {
+            if let timeString = defaults.string(forKey: Keys.daySwitchTime) {
+                let components = timeString.split(separator: ":").compactMap { Int($0) }
+                if components.count == 2 {
+                    return (components[0], components[1])
+                }
+            }
+            // Default to midnight
+            return (0, 0)
+        }
+        
+        set {
+            let timeString = String(format: "%02d:%02d", newValue.hour, newValue.minute)
+            defaults.set(timeString, forKey: Keys.daySwitchTime)
+        }
+    }
+    
+    var daySwitchTimeLabel: String {
+        return defaults.string(forKey: Keys.daySwitchTime) ?? "끔"
+    }
+    
+    var isDaySwitchTimeOn: Bool {
+        return daySwitchTime != (0, 0)
+    }
+    
+    // MARK: - Widget Update Control
+    var shouldUpdateWidget: Bool {
+        get { defaults.bool(forKey: Keys.shouldUpdateWidget) }
+        set { defaults.set(newValue, forKey: Keys.shouldUpdateWidget) }
     }
 }

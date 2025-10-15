@@ -12,10 +12,11 @@ struct PreferencesView: View {
     @AppStorage("schoolName", store: .appGroup) private var schoolName: String = ""
     @AppStorage("grade", store: .appGroup) private var grade: String = ""
     @AppStorage("className", store: .appGroup) private var className: String = ""
+    @AppStorage("daySwitchTime", store: .appGroup) private var daySwitchTime: String = ""
     
     var body: some View {
         List {
-            Section(header: Text("학교 정보")) {
+            Section {
                 LabeledContent("학교") {
                     Text(schoolName)
                 }
@@ -37,9 +38,12 @@ struct PreferencesView: View {
                 }
             }
             
-            Section(header: Text("과목 별칭"), footer: Text("과목 별칭을 추가하면 시간표에 표시되는 라벨을 변경할 수 있습니다.")) {
-                NavigationLink("편집") {
-                    AliasEditorView()
+            Section {
+                // Set when to switch days:
+                // After this time of day, the next day is shown by default
+                NavigationLink(destination: DateChangeTimeView()) {
+                    Text("다음 날 보기")
+                        .badge("\(self.daySwitchTime != "00:00" ? "\(self.daySwitchTime) 이후" : "끔")")
                 }
             }
             
@@ -56,6 +60,46 @@ struct PreferencesView: View {
             }
         }
         .navigationTitle("설정")
+    }
+}
+
+struct DateChangeTimeView: View {
+    @State private var isDaySwitchOn: Bool = PreferencesManager.shared.isDaySwitchTimeOn
+    @State private var daySwitchTime: (hour: Int, minute: Int) = PreferencesManager.shared.daySwitchTime
+
+    var body: some View {
+        Form {
+            Section(footer: Text("전환 시각 이후로 앱과 위젯에서 다음 날의 시간표를 보여줍니다.")) {
+                Toggle("다음 날 보기", isOn: $isDaySwitchOn)
+                    .onChange(of: isDaySwitchOn) { _, new in
+                        if new == false {
+                            PreferencesManager.shared.daySwitchTime = (0, 0)
+                            print("Reset day switch time")
+                            PreferencesManager.shared.shouldUpdateWidget = true
+                        }
+                    }
+                if isDaySwitchOn {
+                    DatePicker("전환 시각", selection: Binding(
+                        get: {
+                            let components = DateComponents(hour: daySwitchTime.hour, minute: daySwitchTime.minute)
+                            return Calendar.current.date(from: components) ?? Date()
+                        },
+                        set: { newDate in
+                            let components = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+                            if let hour = components.hour, let minute = components.minute {
+                                daySwitchTime = (hour, minute)
+                                PreferencesManager.shared.daySwitchTime = daySwitchTime
+                                print("Set day switch time to \(daySwitchTime.hour):\(daySwitchTime.minute)")
+                                PreferencesManager.shared.shouldUpdateWidget = true
+                            }
+                        }
+                    ), displayedComponents: .hourAndMinute)
+                    .datePickerStyle(.wheel)
+                    .labelsHidden()
+                }
+            }
+        }
+        .navigationTitle("다음 날 보기")
     }
 }
 
@@ -110,7 +154,7 @@ struct AdvancedInfoView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
             
-            Section(header: Text("학교 정보"), footer: Text("드롭다운에 뭔가 문제가 생겨서 반을 제대로 설정할 수 없을 때를 대비해 만들어 두었습니다.")) {
+            Section(header: Text("학교 정보"), footer: Text("이 설정은 바꾼 다음 자동으로 반영되지 않을 수 있어요. 설정을 완료하면 캐시를 비우고 앱을 재시작해주세요.")) {
                 Picker("학교 유형", selection: $schoolType) {
                     Text("고등학교").tag("고등학교")
                     Text("중학교").tag("중학교")
@@ -153,6 +197,9 @@ struct AdvancedInfoView: View {
             }
             
             Section(header: Text("저장공간"), footer: Text("아마도 제 캐시 관리 로직이 알아서 필요없는 캐시를 비우겠지만, 찝찝하시면 수동으로 비우셔도 좋습니다.")) {
+                NavigationLink("과목 별칭...") {
+                    AliasEditorView()
+                }
                 LabeledContent("캐시 크기") {
                     Text("\(CacheManager.shared.cacheSize)")
                 }
@@ -167,6 +214,7 @@ struct AdvancedInfoView: View {
                 }
             }
         }
+        .navigationTitle("고급")
     }
 }
 
