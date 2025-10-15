@@ -6,10 +6,15 @@
 //
 
 import Foundation
+import WidgetKit
 
 struct CachedSchedule: Codable {
     let timestamp: Date
     let currentWeek: [TimetableDay]
+}
+
+extension UserDefaults {
+    static let appGroup = UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard
 }
 
 final class CacheManager {
@@ -90,16 +95,10 @@ final class CacheManager {
                 defaults.removeObject(forKey: key)
             }
         }
+        reloadWidgets()
     }
-}
-
-// MARK: - Extensions
-extension Date {
-    func weekIdentifier() -> String {
-        let calendar = Calendar(identifier: .gregorian)
-        let monday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self))!
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: monday) // e.g. "2025-06-09"
+    
+    func reloadWidgets() {
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }

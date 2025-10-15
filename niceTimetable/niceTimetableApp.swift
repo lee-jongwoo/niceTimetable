@@ -9,12 +9,9 @@ import SwiftUI
 
 @main
 struct niceTimetableApp: App {
-    @StateObject private var aliasStore = AliasStore()
-    
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environmentObject(aliasStore)
         }
     }
 }

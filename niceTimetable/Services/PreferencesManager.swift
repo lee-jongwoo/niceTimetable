@@ -12,7 +12,7 @@ final class PreferencesManager {
     static let shared = PreferencesManager()
     private init() {}
     
-    private let defaults = UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard
+    private let defaults = UserDefaults.appGroup
     private let aliasesKey = "subjectAliases"
     
     private enum Keys {
@@ -23,6 +23,27 @@ final class PreferencesManager {
         static let grade = "grade"
         static let className = "className"
         static let aliases = "subjectAliases"
+    }
+    
+    // MARK: - Date Control Functions
+    // Not currenly customizable, but might be in the future
+    func startOfWeek(for date: Date) -> Date {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date)
+        return calendar.date(from: components) ?? date
+    }
+    
+    func weekdayTimeFrame(for date: Date) -> (start: Date, end: Date) {
+        let startOfWeek = self.startOfWeek(for: date)
+        // Find Monday after startOfWeek (which may be Sunday)
+        let start = startOfWeek.next(.monday, considerToday: true)
+        let end = startOfWeek.next(.friday, considerToday: true)
+        return (start, end)
+    }
+    
+    // May change start time of day in the future
+    func isToday(_ date: Date) -> Bool {
+        Calendar.current.isDateInToday(date)
     }
     
     // MARK: - Subject Aliases
@@ -91,5 +112,14 @@ final class PreferencesManager {
     var className: String? {
         get { defaults.string(forKey: Keys.className) }
         set { defaults.set(newValue, forKey: Keys.className) }
+    }
+    
+    func setSchoolInfo(school: School, newClass: SchoolClass) {
+        self.schoolType = school.schoolType
+        self.officeCode = school.officeCode
+        self.schoolName = school.schoolName
+        self.schoolCode = school.schoolCode
+        self.grade = newClass.grade
+        self.className = newClass.className
     }
 }

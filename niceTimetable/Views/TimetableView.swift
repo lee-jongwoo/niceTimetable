@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct TimetableView: View {
-    @StateObject private var viewModel = TimetableViewModel()
+    @StateObject private var model = TimetableViewModel()
+    @StateObject private var aliasStore = AliasStore()
     
     var viewModes = ["작게", "크게"]
     @AppStorage("viewMode") private var viewMode: String = "작게"
@@ -16,15 +17,71 @@ struct TimetableView: View {
     
     var body: some View {
         NavigationStack {
-            TabView(selection: $viewModel.currentWeekIndex) {
-                ForEach(-5...3, id: \.self) { offset in
-                    if let week = viewModel.weeks[offset] {
-                        TimetableGridView(week: week, selectedItem: $selectedItem)
+            VStack(alignment: .leading) {
+                // I'm really sorry, but using NavigationTitle here is really buggy with those nested scroll views.
+                Text("시간표")
+                    .font(.largeTitle)
+                    .bold()
+                    .padding()
+                ScrollView(.horizontal) {
+                    LazyHStack(spacing: 0) {
+                        ForEach(-5...3, id: \.self) { offset in
+                            if let week = model.weeks[offset] {
+                                TimetableGridView(week: week, selectedItem: $selectedItem)
+                                    .environmentObject(aliasStore)
+                                    .id(offset)
+                                    .containerRelativeFrame(.horizontal, count: 1, spacing: 0)
+                                    .refreshable {
+                                        await model.checkForUpdates(weekInterval: model.currentWeekIndex ?? 0)
+                                    }
+                            } else if let errorMsg = model.errorMessages[offset] {
+                                VStack {
+                                    if errorMsg == "tableNotRegistered" {
+                                        Image(systemName: "info.circle")
+                                            .font(.largeTitle)
+                                            .foregroundStyle(.secondary)
+                                        Text("시간표가 존재하지 않음")
+                                            .font(.headline)
+                                        Text("아직 학교에서 해당 기간의 시간표를 등록하지 않았을 수 있습니다.")
+                                            .font(.caption)
+                                            .multilineTextAlignment(.center)
+                                            .frame(maxWidth: 300)
+                                    } else {
+                                        Image(systemName: "exclamationmark.triangle")
+                                            .font(.largeTitle)
+                                            .foregroundStyle(.yellow)
+                                        Text("시간표를 불러올 수 없음")
+                                            .font(.headline)
+                                        Text(errorMsg)
+                                            .font(.caption)
+                                            .multilineTextAlignment(.center)
+                                            .frame(maxWidth: 300)
+                                    }
+                                }
+                                .padding()
+                                .background {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(.regularMaterial)
+                                }
+                                .id(offset)
+                                .containerRelativeFrame(.horizontal, count: 1, spacing: 0)
+                            } else {
+                                // TODO: Replace with skeleton view
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .id(offset)
+                                    .containerRelativeFrame(.horizontal, count: 1, spacing: 0)
+                            }
+                        }
                     }
+                    .scrollTargetLayout()
                 }
+                .scrollTargetBehavior(.paging)
+                .scrollIndicators(.hidden)
+                .scrollPosition(id: $model.currentWeekIndex, anchor: .center)
+                
+                Spacer()
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .navigationTitle("시간표")
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     NavigationLink(destination: PreferencesView()) {
@@ -42,10 +99,10 @@ struct TimetableView: View {
                     }
                 }
                 ToolbarItemGroup(placement: .bottomBar) {
-                    if (viewModel.currentWeekIndex < -1) || (viewModel.currentWeekIndex > 1) {
+                    if (model.currentWeekIndex != 0) {
                         Button(action: {
                             withAnimation {
-                                viewModel.currentWeekIndex = 0
+                                model.currentWeekIndex = 0
                             }
                         }) {
                             Text("오늘")
@@ -56,27 +113,24 @@ struct TimetableView: View {
                 }
             }
             .onAppear {
-                viewModel.loadThreeWeeks()
+                Task {
+                    await model.loadThreeWeeks()
+                }
             }
-            .onChange(of: viewModel.currentWeekIndex) {
-                viewModel.handleWeekChange(to: viewModel.currentWeekIndex)
+            .onChange(of: model.currentWeekIndex) { _, newValue in
+                if let newValue {
+                    Task {
+                        await model.handleWeekChange(to: newValue)
+                    }
+                }
             }
             .task {
-                viewModel.checkForUpdates() // Fetch for updated data
-                viewModel.clearOldCache()   // Remove old cache
-            }
-            .refreshable {
-                viewModel.checkForUpdates(weekInterval: viewModel.currentWeekIndex)
+                await model.checkForUpdates() // Fetch for updated data
+                model.clearOldCache()   // Remove old cache
             }
             .sheet(item: $selectedItem) { item in
                 TimetableDetailsView(column: item)
-            }
-            .overlay {
-                if let error = viewModel.errorMessage {
-                    Text(error)
-                        .padding()
-                        .foregroundStyle(.red)
-                }
+                    .environmentObject(aliasStore)
             }
         }
     }
@@ -93,11 +147,11 @@ struct TimetableGridView: View {
             LazyVGrid(columns: columns) {
                 ForEach(week.days) { day in
                     VStack {
-                        Text(day.date.formatted(.dateTime.month(.defaultDigits).day(.defaultDigits)))
+                        Text(DateFormatters.monthDay.string(from: day.date))
                             .font(.footnote)
                         
                         ForEach(day.columns) { column in
-                            TimetableItemView(column: column, isToday: Calendar.current.isDateInToday(day.date), dayLength: day.columns.count, selectedItem: $selectedItem)
+                            TimetableItemView(column: column, isToday: PreferencesManager.shared.isToday(day.date), dayLength: day.columns.count, selectedItem: $selectedItem)
                         }
                     }
                 }
@@ -105,7 +159,6 @@ struct TimetableGridView: View {
             .frame(maxWidth: 500)
             .padding()
         }
-        .tag(week.weekInterval)
     }
 }
 

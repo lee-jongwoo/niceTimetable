@@ -6,13 +6,12 @@
 //
 
 import SwiftUI
-import WidgetKit
 
 struct PreferencesView: View {
     @State var showingSchoolSearch = false
-    @AppStorage("schoolName", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolName: String = ""
-    @AppStorage("grade", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var grade: String = ""
-    @AppStorage("className", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var className: String = ""
+    @AppStorage("schoolName", store: .appGroup) private var schoolName: String = ""
+    @AppStorage("grade", store: .appGroup) private var grade: String = ""
+    @AppStorage("className", store: .appGroup) private var className: String = ""
     
     var body: some View {
         List {
@@ -33,7 +32,7 @@ struct PreferencesView: View {
                 }
                 .sheet(isPresented: $showingSchoolSearch) {
                     NavigationStack {
-                        SchoolSearchView()
+                        SetSchoolView(isWelcomeScreen: false)
                     }
                 }
             }
@@ -79,8 +78,8 @@ struct AboutView: View {
                     아직 저 말고는 목록에 사람이 없네요.
                     이 앱은 오픈 소스로 공개되어 있습니다. 혹시 SwiftUI 개발에 관심이 있으시다면, [GitHub](https://github.com/lee-jongwoo/niceTimetable)에서 niceTimetable 레포지토리를 확인해 보세요. PR 언제나 환영입니다.
                     """)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
             
             Section(header: Text("라이선스")) {
@@ -88,8 +87,8 @@ struct AboutView: View {
                     이 앱은 외부 오픈 소스 라이브러리를 사용하지 않았습니다.
                     라이선스는 MIT 라이선스입니다.
                     """)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
         }
         .navigationTitle("정보")
@@ -98,13 +97,12 @@ struct AboutView: View {
 }
 
 struct AdvancedInfoView: View {
-    // TODO: This is aesthetically unpleasing...
-    @AppStorage("schoolType", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolType: String = "고등학교"
-    @AppStorage("officeCode", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var officeCode: String = ""
-    @AppStorage("schoolName", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolName: String = ""
-    @AppStorage("schoolCode", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var schoolCode: String = ""
-    @AppStorage("grade", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var grade: String = ""
-    @AppStorage("className", store: UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") ?? .standard) private var className: String = ""
+    @AppStorage("schoolType", store: .appGroup) private var schoolType: String = "고등학교"
+    @AppStorage("officeCode", store: .appGroup) private var officeCode: String = ""
+    @AppStorage("schoolName", store: .appGroup) private var schoolName: String = ""
+    @AppStorage("schoolCode", store: .appGroup) private var schoolCode: String = ""
+    @AppStorage("grade", store: .appGroup) private var grade: String = ""
+    @AppStorage("className", store: .appGroup) private var className: String = ""
     
     var body: some View {
         Form {
@@ -165,7 +163,7 @@ struct AdvancedInfoView: View {
             
             Section(header: Text("위젯"), footer: Text("위젯을 강제로 새로고침합니다.")) {
                 Button("갱신") {
-                    WidgetCenter.shared.reloadAllTimelines()
+                    CacheManager.shared.reloadWidgets()
                 }
             }
         }

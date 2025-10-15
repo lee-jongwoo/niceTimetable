@@ -14,16 +14,13 @@ struct Provider: TimelineProvider {
     }
     
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        NEISAPIClient.shared.fetchWeeklyTable() { result in
-            switch result {
-            case .success(let days):
-                let entry = SimpleEntry(date: Date(), data: days)
-                completion(entry)
-            case .failure(let error):
-                let entry = SimpleEntry(date: Date(), data: [])
-                completion(entry)
-                print("Error fetching timetable: \(error.localizedDescription)")
-            }
+        if let cached = NEISAPIClient.shared.fetchCachedWeeklyTable(weekInterval: 0) {
+            let entry = SimpleEntry(date: Date(), data: cached)
+            completion(entry)
+        } else {
+            let entry = SimpleEntry(date: Date(), data: [])
+            completion(entry)
+            print("No cache available for snapshot.")
         }
     }
     
@@ -39,11 +36,10 @@ struct Provider: TimelineProvider {
             let timeline = Timeline(entries: [currentEntry, midnightEntry], policy: .atEnd)
             completion(timeline)
         } else {
-            // uh-oh no cache
-            // request fetch
-            NEISAPIClient.shared.fetchWeeklyTable{ result in
-                switch result {
-                case .success(let days):
+            // No cache, fetch new data
+            Task {
+                do {
+                    let days = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 0, disableCache: true)
                     CacheManager.shared.set(days, for: now.weekIdentifier())
                     let midnight = calendar.startOfDay(for: now.addingTimeInterval(86400))
                     let entries = [
@@ -51,7 +47,7 @@ struct Provider: TimelineProvider {
                         SimpleEntry(date: midnight, data: days)
                     ]
                     completion(Timeline(entries: entries, policy: .atEnd))
-                case .failure(let error):
+                } catch {
                     print("Error from widget timeline fetch: \(error.localizedDescription)")
                     let fallback = SimpleEntry(date: now, data: [])
                     let retry = now.addingTimeInterval(15 * 60)
@@ -123,7 +119,7 @@ struct WidgetGridView: View {
             ForEach(entry.data) { day in
                 VStack(spacing: 1) {
                     ForEach(day.columns) { column in
-                        WidgetDailyItemView(column: column, itemAspectRatio: itemAspectRatio, isToday: Calendar.current.isDateInToday(day.date))
+                        WidgetDailyItemView(column: column, itemAspectRatio: itemAspectRatio, isToday: PreferencesManager.shared.isToday(day.date))
                     }
                 }
             }

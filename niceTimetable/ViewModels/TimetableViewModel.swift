@@ -8,75 +8,67 @@
 import Foundation
 import Combine
 import SwiftUI
-import WidgetKit
 
 @MainActor
 class TimetableViewModel: ObservableObject {
-    @Published var days: [TimetableDay] = []
     // Adding pagination: now user can swipe through weeks
     @Published var weeks: [Int: TimetableWeek] = [:]
-    @Published var errorMessage: String?
-    @Published var currentWeekIndex: Int = 0    // Track which week is currently displayed
+    @Published var errorMessages: [Int: String] = [:] // Track errors per week
+    @Published var currentWeekIndex: Int? = 0    // Track which week is currently displayed
     @Published var loadedWeekIndices: [Int] = [] // Track which weeks have been loaded
     
-    func loadThreeWeeks() {
+    func loadThreeWeeks() async {
         // Load previous, current, and next week
-        let group = DispatchGroup()
+        async let lastWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: -1)
+        async let thisWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 0)
+        async let nextWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 1)
+        
+        let results = await [lastWeek, thisWeek, nextWeek]
         var tempWeeks: [TimetableWeek] = []
         var tempLoadedIndices: [Int] = []
-        for offset in -1...1 {
-            group.enter()
-            NEISAPIClient.shared.fetchWeeklyTable(weekInterval: offset) { result in
-                switch result {
-                case .success(let days):
-                    let week = TimetableWeek(days: days, weekInterval: offset)
-                    tempWeeks.append(week)
-                    tempLoadedIndices.append(offset)
-                    self.errorMessage = nil
-                case .failure(let error):
-                    print("Error while fetching timetable \(offset): \(error.localizedDescription)")
-                }
-                group.leave()
+        
+        for (index, days) in results.enumerated() {
+            let offset = index - 1 // -1, 0, 1
+            if let days {
+                let week = TimetableWeek(days: days, weekInterval: offset)
+                tempWeeks.append(week)
+                tempLoadedIndices.append(offset)
+            } else {
+                self.errorMessages[offset] = "불러오기 실패(\(offset))"
             }
         }
-        group.notify(queue: .main) {
-            // Sort weeks by their weekInterval to ensure correct order
-            let sortedWeeks = tempWeeks.sorted { $0.weekInterval < $1.weekInterval }
-            self.weeks = Dictionary(uniqueKeysWithValues: sortedWeeks.map { ($0.weekInterval, $0) })
-            self.loadedWeekIndices = tempLoadedIndices.sorted()
-        }
+        
+        self.weeks = Dictionary(uniqueKeysWithValues: tempWeeks.map { ($0.weekInterval, $0) })
+        self.loadedWeekIndices = tempLoadedIndices.sorted()
     }
     
-    func checkForUpdates(weekInterval: Int = 0) {
-        NEISAPIClient.shared.fetchWeeklyTable(weekInterval: weekInterval, disableCache: true) { result in
-            switch result {
-            case .success(let days):
-                // Check if there's any difference
-                print("Fetched week \(weekInterval) for update check.")
-                self.errorMessage = nil
-                if let existingWeek = self.weeks[weekInterval] {
-                    if existingWeek.days != days {
-                        // Update the week
-                        print("Week \(weekInterval) has updates. Updating...")
-                        let updatedWeek = TimetableWeek(days: days, weekInterval: weekInterval)
-                        self.weeks[weekInterval] = updatedWeek
-                        CacheManager.shared.set(days, for: updatedWeek.days[0].date.weekIdentifier())
-                        // Update the widget!
-                        // only if current week is updated
-                        if weekInterval == 0 {
-                            WidgetCenter.shared.reloadAllTimelines()
-                        }
+    func checkForUpdates(weekInterval: Int = 0) async {
+        do {
+            let days = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: weekInterval, disableCache: true)
+            self.errorMessages[weekInterval] = nil
+            if let existingWeek = self.weeks[weekInterval] {
+                if existingWeek.days != days {
+                    // Update the week
+                    print("Week \(weekInterval) has updates. Updating...")
+                    let updatedWeek = TimetableWeek(days: days, weekInterval: weekInterval)
+                    self.weeks[weekInterval] = updatedWeek
+                    CacheManager.shared.set(days, for: updatedWeek.days[0].date.weekIdentifier())
+                    // Update the widget!
+                    // only if current week is updated
+                    if weekInterval == 0 {
+                        CacheManager.shared.reloadWidgets()
                     }
-                } else {
-                    // Week not loaded yet, just add it
-                    self.errorMessage = nil
-                    let newWeek = TimetableWeek(days: days, weekInterval: weekInterval)
-                    self.weeks[weekInterval] = newWeek
-                    CacheManager.shared.set(days, for: newWeek.days[0].date.weekIdentifier())
                 }
-            case .failure(let error):
-                self.errorMessage = "Error checking updates: \(error.localizedDescription)"
+            } else {
+                // Week not loaded yet, just add it
+                self.errorMessages[weekInterval] = nil
+                let newWeek = TimetableWeek(days: days, weekInterval: weekInterval)
+                self.weeks[weekInterval] = newWeek
+                CacheManager.shared.set(days, for: newWeek.days[0].date.weekIdentifier())
             }
+        } catch {
+            self.errorMessages[weekInterval] = "업데이트 실패(\(weekInterval)): \(error.localizedDescription)"
+            print("Error while updating week (\(weekInterval)): \(error.localizedDescription)")
         }
     }
     
@@ -84,36 +76,33 @@ class TimetableViewModel: ObservableObject {
         CacheManager.shared.pruneOldWeeks(keeping: -1...1)
     }
     
-    func handleWeekChange(to newIndex: Int) {
+    func handleWeekChange(to newIndex: Int) async {
         // If newIndex is at start or end of loadedWeekIndices, load more weeks
-        print("Current loaded weeks: \(loadedWeekIndices), requested week: \(newIndex)")
         if newIndex == (loadedWeekIndices.min() ?? 0) {
             // Load previous week
-            let newWeekOffset = (loadedWeekIndices.min() ?? 0) - 1
-            NEISAPIClient.shared.fetchWeeklyTable(weekInterval: newWeekOffset) { result in
-                switch result {
-                case .success(let days):
-                    let newWeek = TimetableWeek(days: days, weekInterval: newWeekOffset)
-                    self.weeks[newWeekOffset] = newWeek
-                    self.loadedWeekIndices.insert(newWeekOffset, at: 0)
-                    self.errorMessage = nil
-                case .failure(let error):
-                    print("Error loading previous week: \(error.localizedDescription)")
-                }
+            let newWeekOffset = newIndex - 1
+            do {
+                let days = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: newWeekOffset)
+                let newWeek = TimetableWeek(days: days, weekInterval: newWeekOffset)
+                self.weeks[newWeekOffset] = newWeek
+                self.loadedWeekIndices.insert(newWeekOffset, at: 0)
+                self.errorMessages[newWeekOffset] = nil
+            } catch {
+                self.errorMessages[newWeekOffset] = "추가 요청 실패(\(newWeekOffset)): \(error.localizedDescription)"
             }
         } else if newIndex == (loadedWeekIndices.max() ?? 0) {
             // Load next week
-            let newWeekOffset = (loadedWeekIndices.max() ?? 0) + 1
-            NEISAPIClient.shared.fetchWeeklyTable(weekInterval: newWeekOffset) { result in
-                switch result {
-                case .success(let days):
-                    let newWeek = TimetableWeek(days: days, weekInterval: newWeekOffset)
-                    self.weeks[newWeekOffset] = newWeek
-                    self.loadedWeekIndices.append(newWeekOffset)
-                    self.errorMessage = nil
-                case .failure(let error):
-                    print("Error loading next week: \(error.localizedDescription)")
-                }
+            let newWeekOffset = newIndex + 1
+            do {
+                let days = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: newWeekOffset)
+                let newWeek = TimetableWeek(days: days, weekInterval: newWeekOffset)
+                self.weeks[newWeekOffset] = newWeek
+                self.loadedWeekIndices.append(newWeekOffset)
+                self.errorMessages[newWeekOffset] = nil
+            } catch NetworkingError.emptyData {
+                self.errorMessages[newWeekOffset] = "tableNotRegistered"
+            } catch {
+                self.errorMessages[newWeekOffset] = "추가 요청 실패(\(newWeekOffset)): \(error.localizedDescription)"
             }
         }
     }
