@@ -127,10 +127,13 @@ struct WidgetGridView: View {
     var body: some View {
         LazyVGrid(columns: columns) {
             ForEach(entry.data) { day in
-                VStack(spacing: 1) {
+                VStack(spacing: 0) {
                     ForEach(day.columns) { column in
-                        WidgetDailyItemView(column: column, itemAspectRatio: itemAspectRatio, isToday: PreferencesManager.shared.isToday(day.date))
+                        ColumnTile(column: column, itemAspectRatio: itemAspectRatio, isToday: PreferencesManager.shared.isToday(day.date))
                     }
+                }
+                .mask {
+                    RoundedRectangle(cornerRadius: 5)
                 }
             }
         }
@@ -141,82 +144,51 @@ struct WidgetGridView: View {
 }
 
 // MARK: - Items for System view
-struct WidgetDailyItemView: View {
+struct ColumnTile: View {
     let column: TimetableColumn
     let itemAspectRatio: CGFloat
     let isToday: Bool
     
     @Environment(\.widgetFamily) var family
     @Environment(\.widgetRenderingMode) var renderingMode
-    
-    
+
     var body: some View {
-        if isToday {
-            switch renderingMode {
-            case .fullColor:
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(Color("AccentColor"))
-                    .aspectRatio(itemAspectRatio, contentMode: .fit)
-                    .overlay {
-                        Text(family == .systemMedium ? column.displayName : column.compactDisplayName)
-                            .foregroundStyle(.white)
-                            .bold()
-                            .minimumScaleFactor(0.5)
-                    }
-            case .vibrant:
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(Color("AccentColor"))
-                    .aspectRatio(itemAspectRatio, contentMode: .fit)
-                    .overlay {
-                        Text(family == .systemMedium ? column.displayName : column.compactDisplayName)
-                            .foregroundStyle(.white)
-                            .bold()
-                            .minimumScaleFactor(0.5)
-                    }
-            default:
-                RoundedRectangle(cornerRadius: 3)
-                    .opacity(0)
-                    .aspectRatio(itemAspectRatio, contentMode: .fit)
-                    .overlay {
-                        Text(family == .systemMedium ? column.displayName : column.compactDisplayName)
-                            .foregroundStyle(.white)
-                            .fontWeight(.heavy)
-                            .minimumScaleFactor(0.5)
-                    }
+        RoundedRectangle(cornerRadius: 0)
+            .fill(fillColor)
+            .aspectRatio(itemAspectRatio, contentMode: .fit)
+            .overlay {
+                Text(family == .systemMedium ? column.displayName : column.compactDisplayName)
+                    .foregroundStyle(textColor)
+                    .fontWeight(fontWeight)
+                    .minimumScaleFactor(0.5)
             }
-        } else {
-            switch renderingMode {
-            case .fullColor:
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(.gray.opacity(0.15))
-                    .aspectRatio(itemAspectRatio, contentMode: .fit)
-                    .overlay {
-                        Text(family == .systemMedium ? column.displayName : column.compactDisplayName)
-                            .foregroundStyle(Color(UIColor.label))
-                            .minimumScaleFactor(0.5)
-                    }
-            case .vibrant:
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(.gray.opacity(0.2))
-                    .aspectRatio(itemAspectRatio, contentMode: .fit)
-                    .overlay {
-                        Text(family == .systemMedium ? column.displayName : column.compactDisplayName)
-                            .foregroundStyle(Color(UIColor.label))
-                            .minimumScaleFactor(0.5)
-                    }
-            default:
-                RoundedRectangle(cornerRadius: 3)
-                    .opacity(0)
-                    .aspectRatio(itemAspectRatio, contentMode: .fit)
-                    .overlay {
-                        Text(family == .systemMedium ? column.displayName : column.compactDisplayName)
-                            .foregroundStyle(Color(UIColor.label))
-                            .minimumScaleFactor(0.5)
-                    }
-            }
+    }
+
+    // MARK: - Style helpers
+    private var fillColor: Color {
+        switch (isToday, renderingMode) {
+        case (true, .fullColor), (true, .vibrant):
+            return Color("AccentColor")
+        case (true, _):
+            return .clear
+        case (false, .fullColor):
+            return .gray.opacity(0.1)
+        case (false, .vibrant):
+            return .gray.opacity(0.2)
+        default:
+            return .clear
         }
     }
+
+    private var textColor: Color {
+        isToday && (renderingMode == .fullColor || renderingMode == .vibrant) ? .white : .primary
+    }
+
+    private var fontWeight: Font.Weight {
+        isToday ? .bold : .regular
+    }
 }
+
 
 // MARK: - Accessory Inline
 struct WidgetAccessoryInlineView: View {
@@ -255,10 +227,11 @@ struct WidgetAccessoryRectangularView: View {
                     if !Calendar.current.isDateInToday(today.date) {
                         Text("내일")
                             .font(.caption)
+                            .padding(2)
                             .widgetAccentable()
                             .background {
                                 RoundedRectangle(cornerRadius: 4)
-                                    .fill(.ultraThinMaterial)
+                                    .fill(.gray.opacity(0.2))
                             }
                     }
                     Spacer()
@@ -332,15 +305,17 @@ struct Widget_Previews: PreviewProvider {
         Group {
             WeeklyWidgetEntryView(entry: SimpleEntry(date: Date(), data: TimetableDay.sampleWeek))
                 .previewContext(WidgetPreviewContext(family: .systemSmall))
+                .previewDisplayName("Small")
             WeeklyWidgetEntryView(entry: SimpleEntry(date: Date(), data: TimetableDay.sampleWeek))
                 .previewContext(WidgetPreviewContext(family: .systemMedium))
+                .previewDisplayName("Medium")
             DailyWidgetEntryView(entry: SimpleEntry(date: Date(), data: TimetableDay.sampleWeek))
                 .previewContext(WidgetPreviewContext(family: .accessoryInline))
+                .previewDisplayName("Inline")
             DailyWidgetEntryView(entry: SimpleEntry(date: Date(), data: TimetableDay.sampleWeek))
                 .previewContext(WidgetPreviewContext(family: .accessoryRectangular))
+                .previewDisplayName("Small")
         }
         .containerBackground(for: .widget) {}
-        
-        
     }
 }
