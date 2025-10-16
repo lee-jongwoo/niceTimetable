@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "01FEEE9A2E8BD23C00E91178"
-               BuildableName = "niceTimetable.app"
-               BlueprintName = "niceTimetable"
-               ReferencedContainer = "container:niceTimetable.xcodeproj">
+               BuildableName = "NiceTimetable.app"
+               BlueprintName = "NiceTimetable"
+               ReferencedContainer = "container:NiceTimetable.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "01FEEE9A2E8BD23C00E91178"
-            BuildableName = "niceTimetable.app"
-            BlueprintName = "niceTimetable"
-            ReferencedContainer = "container:niceTimetable.xcodeproj">
+            BuildableName = "NiceTimetable.app"
+            BlueprintName = "NiceTimetable"
+            ReferencedContainer = "container:NiceTimetable.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "01FEEE9A2E8BD23C00E91178"
-            BuildableName = "niceTimetable.app"
-            BlueprintName = "niceTimetable"
-            ReferencedContainer = "container:niceTimetable.xcodeproj">
+            BuildableName = "NiceTimetable.app"
+            BlueprintName = "NiceTimetable"
+            ReferencedContainer = "container:NiceTimetable.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

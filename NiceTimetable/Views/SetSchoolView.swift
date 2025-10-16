@@ -140,7 +140,6 @@ struct SetSchoolView: View {
                 }
             }
 
-
             Spacer()
 
             if model.isComplete {

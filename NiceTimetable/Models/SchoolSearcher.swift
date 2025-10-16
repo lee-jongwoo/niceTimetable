@@ -12,7 +12,7 @@ import SwiftUI
     var searchText: String = ""
     var schoolType: String = PreferencesManager.shared.schoolType ?? "고등학교"
     var schools: [School] = []
-    var selectedSchool: School? = nil
+    var selectedSchool: School?
     var classes: [SchoolClass] = []
     var selectedGrade: String = ""
     var selectedClass: String = ""

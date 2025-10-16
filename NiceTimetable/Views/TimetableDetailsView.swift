@@ -19,6 +19,14 @@ struct TimetableDetailsView: View {
     @AppStorage("aliasSetCount") private var aliasSetCount: Int = 0
     @Environment(\.requestReview) private var requestReview
 
+    var initialHint: String {
+        String(aliasLong.firstMeaningfulCharacter.map { String($0) } ?? column.subject.firstMeaningfulCharacter.map { String($0) } ?? "")
+    }
+
+    var isUnchanged: Bool {
+        aliasLong == aliasStore.aliases[column.subject]?.normal ?? "" && aliasShort == aliasStore.aliases[column.subject]?.compact ?? ""
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -33,7 +41,7 @@ struct TimetableDetailsView: View {
 
                 Section(header: Text("이니셜"), footer: Text("작은 화면에서는 별칭 대신 한 글자의 이니셜이 사용됩니다.")) {
                     TextField(
-                        String(aliasLong.firstMeaningfulCharacter.map { String($0) } ?? column.subject.firstMeaningfulCharacter.map { String($0) } ?? ""),
+                        initialHint,
                         text: $aliasShort,
                         onEditingChanged: { began in
                             if began {
@@ -72,7 +80,7 @@ struct TimetableDetailsView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(aliasLong == aliasStore.aliases[column.subject]?.normal ?? "" && aliasShort == aliasStore.aliases[column.subject]?.compact ?? "")
+                    .disabled(isUnchanged)
                 }
 
                 ToolbarItem(placement: .cancellationAction) {

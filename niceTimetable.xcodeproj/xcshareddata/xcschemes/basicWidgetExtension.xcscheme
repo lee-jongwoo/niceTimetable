@@ -17,9 +17,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "01C150AC2E8C003B00D61252"
-               BuildableName = "basicWidgetExtension.appex"
-               BlueprintName = "basicWidgetExtension"
-               ReferencedContainer = "container:niceTimetable.xcodeproj">
+               BuildableName = "BasicWidgetExtension.appex"
+               BlueprintName = "BasicWidgetExtension"
+               ReferencedContainer = "container:NiceTimetable.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -31,9 +31,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "01FEEE9A2E8BD23C00E91178"
-               BuildableName = "niceTimetable.app"
-               BlueprintName = "niceTimetable"
-               ReferencedContainer = "container:niceTimetable.xcodeproj">
+               BuildableName = "NiceTimetable.app"
+               BlueprintName = "NiceTimetable"
+               ReferencedContainer = "container:NiceTimetable.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "01FEEE9A2E8BD23C00E91178"
-            BuildableName = "niceTimetable.app"
-            BlueprintName = "niceTimetable"
-            ReferencedContainer = "container:niceTimetable.xcodeproj">
+            BuildableName = "NiceTimetable.app"
+            BlueprintName = "NiceTimetable"
+            ReferencedContainer = "container:NiceTimetable.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <EnvironmentVariables>
@@ -98,9 +98,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "01FEEE9A2E8BD23C00E91178"
-            BuildableName = "niceTimetable.app"
-            BlueprintName = "niceTimetable"
-            ReferencedContainer = "container:niceTimetable.xcodeproj">
+            BuildableName = "NiceTimetable.app"
+            BlueprintName = "NiceTimetable"
+            ReferencedContainer = "container:NiceTimetable.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

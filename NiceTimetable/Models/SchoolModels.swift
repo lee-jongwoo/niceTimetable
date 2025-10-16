@@ -77,8 +77,8 @@ extension Array where Element == ClassRow {
                 }
             } else {
                 // Try numeric comparison for grade
-                if let g1 = Int($0.grade), let g2 = Int($1.grade) {
-                    return g1 < g2
+                if let gr1 = Int($0.grade), let gr2 = Int($1.grade) {
+                    return gr1 < gr2
                 } else {
                     return $0.grade < $1.grade
                 }

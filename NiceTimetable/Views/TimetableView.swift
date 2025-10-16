@@ -13,7 +13,7 @@ struct TimetableView: View {
 
     var viewModes = ["작게", "크게"]
     @AppStorage("viewMode") private var viewMode: String = "작게"
-    @State var selectedItem: TimetableColumn? = nil
+    @State var selectedItem: TimetableColumn?
 
     var body: some View {
         NavigationStack {
@@ -100,13 +100,11 @@ struct TimetableView: View {
                     }
                 }
                 ToolbarItemGroup(placement: .bottomBar) {
-                    if (model.currentWeekIndex != 0) {
-                        Button(action: {
+                    if model.currentWeekIndex != 0 {
+                        Button("오늘") {
                             withAnimation {
                                 model.currentWeekIndex = 0
                             }
-                        }) {
-                            Text("오늘")
                         }
                     }
 

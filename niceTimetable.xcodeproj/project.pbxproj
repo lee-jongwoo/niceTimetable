@@ -12,7 +12,7 @@
 		0184AF062EA112CF008484BC /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 0184AF052EA112CF008484BC /* .swiftlint.yml */; };
 		01C150B02E8C003B00D61252 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C150AF2E8C003B00D61252 /* WidgetKit.framework */; };
 		01C150B22E8C003C00D61252 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C150B12E8C003B00D61252 /* SwiftUI.framework */; };
-		01C150BD2E8C003D00D61252 /* basicWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 01C150AD2E8C003B00D61252 /* basicWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		01C150BD2E8C003D00D61252 /* BasicWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 01C150AD2E8C003B00D61252 /* BasicWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,7 +32,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				01C150BD2E8C003D00D61252 /* basicWidgetExtension.appex in Embed Foundation Extensions */,
+				01C150BD2E8C003D00D61252 /* BasicWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,29 +43,29 @@
 		014ED2EA2E9268260022C8FF /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		014ED2EC2E9269CB0022C8FF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0184AF052EA112CF008484BC /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
-		01C150AD2E8C003B00D61252 /* basicWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = basicWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		01C150AD2E8C003B00D61252 /* BasicWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BasicWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		01C150AF2E8C003B00D61252 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		01C150B12E8C003B00D61252 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		01C150C92E8C173500D61252 /* basicWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = basicWidgetExtension.entitlements; sourceTree = "<group>"; };
-		01FEEE9B2E8BD23C00E91178 /* niceTimetable.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = niceTimetable.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		01C150C92E8C173500D61252 /* BasicWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BasicWidgetExtension.entitlements; sourceTree = "<group>"; };
+		01FEEE9B2E8BD23C00E91178 /* NiceTimetable.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NiceTimetable.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		014ED2E92E9260610022C8FF /* Exceptions for "niceTimetable" folder in "niceTimetable" target */ = {
+		014ED2E92E9260610022C8FF /* Exceptions for "NiceTimetable" folder in "NiceTimetable" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 01FEEE9A2E8BD23C00E91178 /* niceTimetable */;
+			target = 01FEEE9A2E8BD23C00E91178 /* NiceTimetable */;
 		};
-		01C150C12E8C003D00D61252 /* Exceptions for "basicWidget" folder in "basicWidgetExtension" target */ = {
+		01C150C12E8C003D00D61252 /* Exceptions for "BasicWidget" folder in "BasicWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 01C150AC2E8C003B00D61252 /* basicWidgetExtension */;
+			target = 01C150AC2E8C003B00D61252 /* BasicWidgetExtension */;
 		};
-		01C150C42E8C0FE400D61252 /* Exceptions for "niceTimetable" folder in "basicWidgetExtension" target */ = {
+		01C150C42E8C0FE400D61252 /* Exceptions for "NiceTimetable" folder in "BasicWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AppIcon.icon,
@@ -79,26 +79,26 @@
 				Services/DateFormatters.swift,
 				Services/PreferencesManager.swift,
 			);
-			target = 01C150AC2E8C003B00D61252 /* basicWidgetExtension */;
+			target = 01C150AC2E8C003B00D61252 /* BasicWidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		01C150B32E8C003C00D61252 /* basicWidget */ = {
+		01C150B32E8C003C00D61252 /* BasicWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				01C150C12E8C003D00D61252 /* Exceptions for "basicWidget" folder in "basicWidgetExtension" target */,
+				01C150C12E8C003D00D61252 /* Exceptions for "BasicWidget" folder in "BasicWidgetExtension" target */,
 			);
-			path = basicWidget;
+			path = BasicWidget;
 			sourceTree = "<group>";
 		};
-		01FEEE9D2E8BD23C00E91178 /* niceTimetable */ = {
+		01FEEE9D2E8BD23C00E91178 /* NiceTimetable */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				014ED2E92E9260610022C8FF /* Exceptions for "niceTimetable" folder in "niceTimetable" target */,
-				01C150C42E8C0FE400D61252 /* Exceptions for "niceTimetable" folder in "basicWidgetExtension" target */,
+				014ED2E92E9260610022C8FF /* Exceptions for "NiceTimetable" folder in "NiceTimetable" target */,
+				01C150C42E8C0FE400D61252 /* Exceptions for "NiceTimetable" folder in "BasicWidgetExtension" target */,
 			);
-			path = niceTimetable;
+			path = NiceTimetable;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -138,9 +138,9 @@
 				0184AF052EA112CF008484BC /* .swiftlint.yml */,
 				014ED2EC2E9269CB0022C8FF /* README.md */,
 				014ED2EA2E9268260022C8FF /* .gitignore */,
-				01C150C92E8C173500D61252 /* basicWidgetExtension.entitlements */,
-				01FEEE9D2E8BD23C00E91178 /* niceTimetable */,
-				01C150B32E8C003C00D61252 /* basicWidget */,
+				01C150C92E8C173500D61252 /* BasicWidgetExtension.entitlements */,
+				01FEEE9D2E8BD23C00E91178 /* NiceTimetable */,
+				01C150B32E8C003C00D61252 /* BasicWidget */,
 				01C150AE2E8C003B00D61252 /* Frameworks */,
 				01FEEE9C2E8BD23C00E91178 /* Products */,
 			);
@@ -149,8 +149,8 @@
 		01FEEE9C2E8BD23C00E91178 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				01FEEE9B2E8BD23C00E91178 /* niceTimetable.app */,
-				01C150AD2E8C003B00D61252 /* basicWidgetExtension.appex */,
+				01FEEE9B2E8BD23C00E91178 /* NiceTimetable.app */,
+				01C150AD2E8C003B00D61252 /* BasicWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -158,9 +158,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		01C150AC2E8C003B00D61252 /* basicWidgetExtension */ = {
+		01C150AC2E8C003B00D61252 /* BasicWidgetExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 01C150C22E8C003D00D61252 /* Build configuration list for PBXNativeTarget "basicWidgetExtension" */;
+			buildConfigurationList = 01C150C22E8C003D00D61252 /* Build configuration list for PBXNativeTarget "BasicWidgetExtension" */;
 			buildPhases = (
 				01C150A92E8C003B00D61252 /* Sources */,
 				01C150AA2E8C003B00D61252 /* Frameworks */,
@@ -171,18 +171,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				01C150B32E8C003C00D61252 /* basicWidget */,
+				01C150B32E8C003C00D61252 /* BasicWidget */,
 			);
-			name = basicWidgetExtension;
+			name = BasicWidgetExtension;
 			packageProductDependencies = (
 			);
 			productName = basicWidgetExtension;
-			productReference = 01C150AD2E8C003B00D61252 /* basicWidgetExtension.appex */;
+			productReference = 01C150AD2E8C003B00D61252 /* BasicWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		01FEEE9A2E8BD23C00E91178 /* niceTimetable */ = {
+		01FEEE9A2E8BD23C00E91178 /* NiceTimetable */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 01FEEEA62E8BD23E00E91178 /* Build configuration list for PBXNativeTarget "niceTimetable" */;
+			buildConfigurationList = 01FEEEA62E8BD23E00E91178 /* Build configuration list for PBXNativeTarget "NiceTimetable" */;
 			buildPhases = (
 				01FEEE972E8BD23C00E91178 /* Sources */,
 				0184AF042EA111DD008484BC /* SwiftLint */,
@@ -196,13 +196,13 @@
 				01C150BC2E8C003D00D61252 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				01FEEE9D2E8BD23C00E91178 /* niceTimetable */,
+				01FEEE9D2E8BD23C00E91178 /* NiceTimetable */,
 			);
-			name = niceTimetable;
+			name = NiceTimetable;
 			packageProductDependencies = (
 			);
 			productName = niceTimetable;
-			productReference = 01FEEE9B2E8BD23C00E91178 /* niceTimetable.app */;
+			productReference = 01FEEE9B2E8BD23C00E91178 /* NiceTimetable.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -223,7 +223,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 01FEEE962E8BD23C00E91178 /* Build configuration list for PBXProject "niceTimetable" */;
+			buildConfigurationList = 01FEEE962E8BD23C00E91178 /* Build configuration list for PBXProject "NiceTimetable" */;
 			developmentRegion = ko;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -237,8 +237,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				01FEEE9A2E8BD23C00E91178 /* niceTimetable */,
-				01C150AC2E8C003B00D61252 /* basicWidgetExtension */,
+				01FEEE9A2E8BD23C00E91178 /* NiceTimetable */,
+				01C150AC2E8C003B00D61252 /* BasicWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -266,6 +266,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		0184AF042EA111DD008484BC /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -305,7 +306,7 @@
 /* Begin PBXTargetDependency section */
 		01C150BC2E8C003D00D61252 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 01C150AC2E8C003B00D61252 /* basicWidgetExtension */;
+			target = 01C150AC2E8C003B00D61252 /* BasicWidgetExtension */;
 			targetProxy = 01C150BB2E8C003D00D61252 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -322,7 +323,7 @@
 				DEVELOPMENT_TEAM = 58R5WFN6JY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = basicWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = basicWidget;
+				INFOPLIST_KEY_CFBundleDisplayName = NiceTimetableWidgets;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -355,7 +356,7 @@
 				DEVELOPMENT_TEAM = 58R5WFN6JY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = basicWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = basicWidget;
+				INFOPLIST_KEY_CFBundleDisplayName = NiceTimetableWidgets;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -585,7 +586,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		01C150C22E8C003D00D61252 /* Build configuration list for PBXNativeTarget "basicWidgetExtension" */ = {
+		01C150C22E8C003D00D61252 /* Build configuration list for PBXNativeTarget "BasicWidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				01C150BF2E8C003D00D61252 /* Debug */,
@@ -594,7 +595,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		01FEEE962E8BD23C00E91178 /* Build configuration list for PBXProject "niceTimetable" */ = {
+		01FEEE962E8BD23C00E91178 /* Build configuration list for PBXProject "NiceTimetable" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				01FEEEA42E8BD23E00E91178 /* Debug */,
@@ -603,7 +604,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		01FEEEA62E8BD23E00E91178 /* Build configuration list for PBXNativeTarget "niceTimetable" */ = {
+		01FEEEA62E8BD23E00E91178 /* Build configuration list for PBXNativeTarget "NiceTimetable" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				01FEEEA72E8BD23E00E91178 /* Debug */,

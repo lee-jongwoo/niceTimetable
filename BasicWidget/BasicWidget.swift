@@ -13,7 +13,7 @@ struct Provider: TimelineProvider {
         SimpleEntry(date: Date(), data: TimetableDay.sampleWeek)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
         if let cached = NEISAPIClient.shared.fetchCachedWeeklyTable(weekInterval: 0) {
             let entry = SimpleEntry(date: Date(), data: cached)
             completion(entry)
@@ -24,12 +24,12 @@ struct Provider: TimelineProvider {
         }
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
         let calendar = Calendar.current
         let now = Date()
         let midnight = calendar.startOfDay(for: now.addingTimeInterval(86400))
-        var daySwitchTime: Date? = nil
-        if PreferencesManager.shared.daySwitchTime != (0,0) {
+        var daySwitchTime: Date?
+        if PreferencesManager.shared.daySwitchTime != (0, 0) {
             daySwitchTime = PreferencesManager.shared.daySwitchTimeDate
         }
 
@@ -77,7 +77,7 @@ struct SimpleEntry: TimelineEntry {
     let data: [TimetableDay]
 }
 
-struct WeeklyWidgetEntryView : View {
+struct WeeklyWidgetEntryView: View {
     var entry: Provider.Entry
     var longestDayCount: Int {
         entry.data.map { $0.columns.count }.max() ?? 0
@@ -129,7 +129,11 @@ struct WidgetGridView: View {
             ForEach(entry.data) { day in
                 VStack(spacing: 0) {
                     ForEach(day.columns) { column in
-                        ColumnTile(column: column, itemAspectRatio: itemAspectRatio, isToday: PreferencesManager.shared.isToday(day.date))
+                        ColumnTile(
+                            column: column,
+                            itemAspectRatio: itemAspectRatio,
+                            isToday: PreferencesManager.shared.isToday(day.date)
+                        )
                     }
                 }
                 .mask {
@@ -188,7 +192,6 @@ struct ColumnTile: View {
         isToday ? .bold : .regular
     }
 }
-
 
 // MARK: - Accessory Inline
 struct WidgetAccessoryInlineView: View {
@@ -263,8 +266,6 @@ struct WidgetAccessoryRectangularView: View {
         }
     }
 }
-
-
 
 struct WeeklyWidget: Widget {
     let kind: String = "WeeklyWidget"

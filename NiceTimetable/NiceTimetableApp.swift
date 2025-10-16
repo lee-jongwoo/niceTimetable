@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct niceTimetableApp: App {
+struct NiceTimetableApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()

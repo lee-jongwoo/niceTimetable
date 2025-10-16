@@ -1,7 +1,7 @@
 # .swiftlint.yml
 included:
-  - niceTimetable
-  - basicWidget
+  - NiceTimetable
+  - BasicWidget
 
 disabled_rules:
   # Performance-heavy rules (disable if build time is critical)

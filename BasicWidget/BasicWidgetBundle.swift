@@ -9,7 +9,7 @@ import WidgetKit
 import SwiftUI
 
 @main
-struct basicWidgetBundle: WidgetBundle {
+struct BasicWidgetBundle: WidgetBundle {
     var body: some Widget {
         WeeklyWidget()
         DailyWidget()
