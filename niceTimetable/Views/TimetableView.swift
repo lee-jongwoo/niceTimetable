@@ -10,11 +10,11 @@ import SwiftUI
 struct TimetableView: View {
     @StateObject private var model = TimetableViewModel()
     @StateObject private var aliasStore = AliasStore()
-    
+
     var viewModes = ["작게", "크게"]
     @AppStorage("viewMode") private var viewMode: String = "작게"
     @State var selectedItem: TimetableColumn? = nil
-    
+
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading) {
@@ -79,7 +79,7 @@ struct TimetableView: View {
                 .scrollTargetBehavior(.paging)
                 .scrollIndicators(.hidden)
                 .scrollPosition(id: $model.currentWeekIndex, anchor: .center)
-                
+
                 Spacer()
             }
             .ignoresSafeArea(edges: .bottom)
@@ -109,7 +109,7 @@ struct TimetableView: View {
                             Text("오늘")
                         }
                     }
-                    
+
                     Spacer()
                 }
             }
@@ -145,7 +145,7 @@ struct TimetableGridView: View {
     let week: TimetableWeek
     var columns: [GridItem] = Array(repeating: .init(.flexible(), alignment: .top), count: 5)
     @Binding var selectedItem: TimetableColumn?
-    
+
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns) {
@@ -153,9 +153,14 @@ struct TimetableGridView: View {
                     VStack {
                         Text(DateFormatters.monthDay.string(from: day.date))
                             .font(.footnote)
-                        
+
                         ForEach(day.columns) { column in
-                            TimetableItemView(column: column, isToday: PreferencesManager.shared.isToday(day.date), dayLength: day.columns.count, selectedItem: $selectedItem)
+                            TimetableItemView(
+                                column: column,
+                                isToday: PreferencesManager.shared.isToday(day.date),
+                                dayLength: day.columns.count,
+                                selectedItem: $selectedItem
+                            )
                         }
                     }
                 }
@@ -173,15 +178,15 @@ struct TimetableItemView: View {
     @AppStorage("viewMode") private var viewMode: String = "작게"
     @EnvironmentObject var aliasStore: AliasStore
     @Binding var selectedItem: TimetableColumn?
-    
+
     var displayName: String {
         aliasStore.aliases[column.subject]?.normal.nonEmpty ?? column.subject
     }
-    
+
     var compactDisplayName: String {
         aliasStore.aliases[column.subject]?.compact.nonEmpty ?? String(column.subject.firstMeaningfulCharacter.map { String($0) } ?? "")
     }
-    
+
     var body: some View {
         Button {
             selectedItem = column

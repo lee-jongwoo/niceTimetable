@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		014ED2EB2E9268260022C8FF /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 014ED2EA2E9268260022C8FF /* .gitignore */; };
 		014ED2ED2E9269CB0022C8FF /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 014ED2EC2E9269CB0022C8FF /* README.md */; };
+		0184AF062EA112CF008484BC /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = 0184AF052EA112CF008484BC /* .swiftlint.yml */; };
 		01C150B02E8C003B00D61252 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C150AF2E8C003B00D61252 /* WidgetKit.framework */; };
 		01C150B22E8C003C00D61252 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01C150B12E8C003B00D61252 /* SwiftUI.framework */; };
 		01C150BD2E8C003D00D61252 /* basicWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 01C150AD2E8C003B00D61252 /* basicWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -41,6 +42,7 @@
 /* Begin PBXFileReference section */
 		014ED2EA2E9268260022C8FF /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		014ED2EC2E9269CB0022C8FF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0184AF052EA112CF008484BC /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		01C150AD2E8C003B00D61252 /* basicWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = basicWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		01C150AF2E8C003B00D61252 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		01C150B12E8C003B00D61252 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -133,6 +135,7 @@
 		01FEEE922E8BD23C00E91178 = {
 			isa = PBXGroup;
 			children = (
+				0184AF052EA112CF008484BC /* .swiftlint.yml */,
 				014ED2EC2E9269CB0022C8FF /* README.md */,
 				014ED2EA2E9268260022C8FF /* .gitignore */,
 				01C150C92E8C173500D61252 /* basicWidgetExtension.entitlements */,
@@ -182,6 +185,7 @@
 			buildConfigurationList = 01FEEEA62E8BD23E00E91178 /* Build configuration list for PBXNativeTarget "niceTimetable" */;
 			buildPhases = (
 				01FEEE972E8BD23C00E91178 /* Sources */,
+				0184AF042EA111DD008484BC /* SwiftLint */,
 				01FEEE982E8BD23C00E91178 /* Frameworks */,
 				01FEEE992E8BD23C00E91178 /* Resources */,
 				01C150BE2E8C003D00D61252 /* Embed Foundation Extensions */,
@@ -244,6 +248,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0184AF062EA112CF008484BC /* .swiftlint.yml in Resources */,
 				014ED2EB2E9268260022C8FF /* .gitignore in Resources */,
 				014ED2ED2E9269CB0022C8FF /* README.md in Resources */,
 			);
@@ -257,6 +262,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0184AF042EA111DD008484BC /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/niceTimetable/**/*.swift",
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/sh\n\n# SwiftLint Build Phase Script\n# Only run if SwiftLint is installed\n\nif which swiftlint >/dev/null; then\n    # Lint only Swift files in Sources and Tests\n    swiftlint \\\n        lint \"niceTimetable\" \\\n        --incremental \\\n        --quiet \\\n        --reporter emoji\n    \n    # Auto-correct fixable issues\n    swiftlint \\\n        autocorrect \\\n        \"niceTimetable\" \\\n        --quiet\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\n    echo \"warning: To install, run: brew install swiftlint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		01C150A92E8C003B00D61252 /* Sources */ = {
@@ -310,6 +337,7 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -342,6 +370,7 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -386,7 +415,7 @@
 				DEVELOPMENT_TEAM = 58R5WFN6JY;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -453,7 +482,7 @@
 				DEVELOPMENT_TEAM = 58R5WFN6JY;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -507,6 +536,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -545,6 +575,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -16,17 +16,17 @@ class TimetableViewModel: ObservableObject {
     @Published var errorMessages: [Int: String] = [:] // Track errors per week
     @Published var currentWeekIndex: Int? = 0    // Track which week is currently displayed
     @Published var loadedWeekIndices: [Int] = [] // Track which weeks have been loaded
-    
+
     func loadThreeWeeks() async {
         // Load previous, current, and next week
         async let lastWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: -1)
         async let thisWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 0)
         async let nextWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 1)
-        
+
         let results = await [lastWeek, thisWeek, nextWeek]
         var tempWeeks: [TimetableWeek] = []
         var tempLoadedIndices: [Int] = []
-        
+
         for (index, days) in results.enumerated() {
             let offset = index - 1 // -1, 0, 1
             if let days {
@@ -37,11 +37,11 @@ class TimetableViewModel: ObservableObject {
                 self.errorMessages[offset] = "불러오기 실패(\(offset))"
             }
         }
-        
+
         self.weeks = Dictionary(uniqueKeysWithValues: tempWeeks.map { ($0.weekInterval, $0) })
         self.loadedWeekIndices = tempLoadedIndices.sorted()
     }
-    
+
     func checkForUpdates(weekInterval: Int = 0) async {
         do {
             let days = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: weekInterval, disableCache: true)
@@ -72,11 +72,11 @@ class TimetableViewModel: ObservableObject {
             print("Error while updating week (\(weekInterval)): \(error.localizedDescription)")
         }
     }
-    
+
     func clearOldCache() {
         CacheManager.shared.pruneOldWeeks(keeping: -1...1)
     }
-    
+
     func handleWeekChange(to newIndex: Int) async {
         // If newIndex is at start or end of loadedWeekIndices, load more weeks
         if newIndex == (loadedWeekIndices.min() ?? 0) {

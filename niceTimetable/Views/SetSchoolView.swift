@@ -13,7 +13,7 @@ struct SetSchoolView: View {
     @State private var model = SchoolSearcher()
     @State var showingSchoolSearch = true
     @Environment(\.dismiss) var dismiss
-    
+
     var body: some View {
         ScrollView {
             VStack {
@@ -92,7 +92,7 @@ struct SetSchoolView: View {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(.ultraThinMaterial)
             }
-            
+
             if model.selectedSchool != nil {
                 VStack {
                     HStack {
@@ -101,7 +101,7 @@ struct SetSchoolView: View {
                             .bold()
                         Spacer()
                     }
-                    
+
                     LabeledContent {
                         Picker("학년", selection: $model.selectedGrade) {
                             Text("선택").tag("")
@@ -115,9 +115,9 @@ struct SetSchoolView: View {
                         Text("학년")
                     }
                     .padding(.vertical, 4)
-                    
+
                     Divider()
-                    
+
                     LabeledContent {
                         Picker("반", selection: $model.selectedClass) {
                             Text("선택").tag("")
@@ -131,7 +131,7 @@ struct SetSchoolView: View {
                         Text("반")
                     }
                     .padding(.vertical, 4)
-                    
+
                 }
                 .padding()
                 .background {
@@ -139,10 +139,10 @@ struct SetSchoolView: View {
                         .fill(.ultraThinMaterial)
                 }
             }
-            
-            
+
+
             Spacer()
-            
+
             if model.isComplete {
                 Button(action: {
                     // Save to UserDefaults

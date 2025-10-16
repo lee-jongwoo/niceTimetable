@@ -14,7 +14,7 @@ struct DateFormatters {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter
     }()
-    
+
     static let timeStamp: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd"
@@ -40,19 +40,19 @@ extension Date {
     {
         let calendar = Calendar(identifier: .gregorian)
         let components = DateComponents(weekday: weekday.rawValue)
-        
+
         if considerToday &&
             calendar.component(.weekday, from: self) == weekday.rawValue
         {
             return self
         }
-        
+
         return calendar.nextDate(after: self,
                                  matching: components,
                                  matchingPolicy: .nextTime,
                                  direction: direction)!
     }
-    
+
     public enum Weekday: Int {
         case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
     }

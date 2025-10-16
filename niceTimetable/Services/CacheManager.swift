@@ -20,14 +20,14 @@ extension UserDefaults {
 final class CacheManager {
     static let shared = CacheManager()
     private let defaults: UserDefaults
-    
+
     private init() {
         guard let userDefaults = UserDefaults(suiteName: "group.dev.jongwoo.niceTimetable") else {
             fatalError("Failed to initialize UserDefaults with app group.")
         }
         self.defaults = userDefaults
     }
-    
+
     var cacheSize: String {
         var totalSize = 0
         for key in defaults.dictionaryRepresentation().keys {
@@ -37,29 +37,29 @@ final class CacheManager {
         }
         return ByteCountFormatter().string(fromByteCount: Int64(totalSize))
     }
-    
+
     private func cacheKey(for identifier: String) -> String {
         return "cachedSchedule_\(identifier)"
     }
-    
+
     func get(for identifier: String, maxAge: TimeInterval) -> [TimetableDay]? {
         guard let data = defaults.data(forKey: cacheKey(for: identifier)),
               let cached = try? JSONDecoder().decode(CachedSchedule.self, from: data) else { return nil }
-        
+
         if Date().timeIntervalSince(cached.timestamp) < maxAge {
             return cached.currentWeek
         } else {
             return nil
         }
     }
-    
+
     func set(_ days: [TimetableDay], for identifier: String) {
         let cached = CachedSchedule(timestamp: Date(), currentWeek: days)
         if let data = try? JSONEncoder().encode(cached) {
             defaults.set(data, forKey: cacheKey(for: identifier))
         }
     }
-    
+
     func pruneOldWeeks(keeping offsets: ClosedRange<Int>) {
         let allKeys = defaults.dictionaryRepresentation().keys
         // Determine valid week identifiers to keep
@@ -74,7 +74,7 @@ final class CacheManager {
                 validIdentifiers.insert(identifier)
             }
         }
-        
+
         for key in allKeys {
             if key.hasPrefix("cachedSchedule_") {
                 let identifier = String(key.dropFirst("cachedSchedule_".count))
@@ -84,11 +84,11 @@ final class CacheManager {
             }
         }
     }
-    
+
     func purge(for identifier: String) {
         defaults.removeObject(forKey: cacheKey(for: identifier))
     }
-    
+
     func clearAll() {
         for key in defaults.dictionaryRepresentation().keys {
             if key.hasPrefix("cachedSchedule_") {
@@ -97,11 +97,11 @@ final class CacheManager {
         }
         reloadWidgets()
     }
-    
+
     func reloadWidgets() {
         WidgetCenter.shared.reloadAllTimelines()
     }
-    
+
     func reloadWidgetsIfNeeded() {
         if PreferencesManager.shared.shouldUpdateWidget {
             CacheManager.shared.reloadWidgets()

@@ -19,7 +19,7 @@ struct niceTimetableApp: App {
 struct RootView: View {
     @AppStorage("isOnboarding") private var isOnboarding: Bool = true
     @Environment(\.scenePhase) private var scenePhase
-    
+
     var body: some View {
         if isOnboarding {
             OnboardingView()

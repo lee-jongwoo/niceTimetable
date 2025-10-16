@@ -13,46 +13,27 @@ struct SchoolSearchAPIResponse: Codable {
 }
 
 struct SchoolContainer: Codable {
-    let head: [SchoolHead]?
     let row: [SchoolRow]?
 }
 
-struct SchoolHead: Codable {
-    let list_total_count: Int?
-    let RESULT: SchoolResult?
-}
-
-struct SchoolResult: Codable {
-    let CODE: String
-    let MESSAGE: String
-}
-
 struct SchoolRow: Codable {
-    let ATPT_OFCDC_SC_CODE: String   // 교육청 코드
-    let ATPT_OFCDC_SC_NM: String     // 교육청명
-    let SD_SCHUL_CODE: String        // 학교 코드
-    let SCHUL_NM: String             // 학교명
-    let ENG_SCHUL_NM: String?        // 영문 학교명
-    let SCHUL_KND_SC_NM: String      // 학교 종류 (초등학교, 중학교, 고등학교 등)
-    let LCTN_SC_NM: String           // 소재지 시도명
-    let JU_ORG_NM: String            // 관할 교육지원청명
-    let FOND_SC_NM: String           // 설립 구분 (공립, 사립 등)
-    let ORG_RDNZC: String?           // 우편번호
-    let ORG_RDNMA: String?           // 도로명 주소
-    let ORG_RDNDA: String?           // 도로명 상세 주소
-    let ORG_TELNO: String?           // 전화번호
-    let HMPG_ADRES: String?          // 홈페이지 주소
-    let COEDU_SC_NM: String?         // 남녀공학 구분 (남, 여, 공)
-    let ORG_FAXNO: String?           // 팩스번호
-    let HS_SC_NM: String?            // 고등학교 구분 (일반
-    let INDST_SPECL_CCCCL_EXST_YN: String? // 특성화고 여부 (Y/N)
-    let HS_GNRL_BUSNS_SC_NM: String? // 일반고 직업교육 가능 여부
-    let SPCLY_PURPS_HS_ORD_NM: String?
-    let ENE_BFE_SEHF_SC_NM: String?
-    let DGHT_SC_NM: String?
-    let FOND_YMD: String?            // 설립 연월일
-    let FOAS_MEMRD: String?          // 설립자
-    let LOAD_DTM: String?            // 수정일
+    let officeCode: String  // 교육청 코드
+    let officeName: String  // 교육청명
+    let schoolCode: String  // 학교 코드
+    let schoolName: String  // 영문 학교명
+    let schoolType: String  // 학교 종류 (초등학교, 중학교, 고등학교 등)
+    let address: String?    // 도로명 주소자
+    let loadDate: String?   // 수정일
+
+    enum CodingKeys: String, CodingKey {
+        case officeCode = "ATPT_OFCDC_SC_CODE"
+        case officeName = "ATPT_OFCDC_SC_NM"
+        case schoolCode = "SD_SCHUL_CODE"
+        case schoolName = "SCHUL_NM"
+        case schoolType = "SCHUL_KND_SC_NM"
+        case address = "ORG_RDNMA"
+        case loadDate = "LOAD_DTM"
+    }
 }
 
 // MARK: - Class List API Response
@@ -61,29 +42,29 @@ struct ClassListAPIResponse: Codable {
 }
 
 struct ClassContainer: Codable {
-    let head: [ClassHead]?
     let row: [ClassRow]?
 }
 
-struct ClassHead: Codable {
-    let list_total_count: Int?
-    let RESULT: ClassResult?
-}
-
-struct ClassResult: Codable {
-    let CODE: String
-    let MESSAGE: String
-}
-
 struct ClassRow: Codable {
-    let ATPT_OFCDC_SC_CODE: String   // 교육청 코드
-    let ATPT_OFCDC_SC_NM: String     // 교육청명
-    let SD_SCHUL_CODE: String        // 학교 코드
-    let SCHUL_NM: String             // 학교명
-    let AY: String                   // 학년도
-    let GRADE: String                // 학년
-    let CLASS_NM: String             // 반
-    let LOAD_DTM: String?            // 수정일
+    let officeCode: String      // 교육청 코드
+    let officeName: String      // 교육청명
+    let schoolCode: String      // 학교 코드
+    let schoolName: String      // 학교명
+    let academicYear: String    // 학년도
+    let grade: String           // 학년
+    let className: String       // 반
+    let loadDate: String?       // 수정일
+
+    enum CodingKeys: String, CodingKey {
+        case officeCode = "ATPT_OFCDC_SC_CODE"
+        case officeName = "ATPT_OFCDC_SC_NM"
+        case schoolCode = "SD_SCHUL_CODE"
+        case schoolName = "SCHUL_NM"
+        case academicYear = "AY"
+        case grade = "GRADE"
+        case className = "CLASS_NM"
+        case loadDate = "LOAD_DTM"
+    }
 }
 
 // MARK: - Timetable API Response
@@ -111,34 +92,24 @@ struct NEISAPIResponse: Decodable, Sendable {
 
 // NEIS gives either "head" or "row"
 struct TimetableContainer: Codable {
-    let head: [NEISHead]?
     let row: [NEISRow]?
-}
-
-// "head" metadata
-struct NEISHead: Codable {
-    let list_total_count: Int?
-    let RESULT: NEISResult?
-}
-
-struct NEISResult: Codable {
-    let CODE: String
-    let MESSAGE: String
 }
 
 // "row" = actual timetable rows
 struct NEISRow: Codable {
-    let ATPT_OFCDC_SC_CODE: String   // 교육청 코드
-    let ATPT_OFCDC_SC_NM: String     // 교육청명
-    let SD_SCHUL_CODE: String        // 학교 코드
-    let SCHUL_NM: String             // 학교명
-    let AY: String                   // 학년도
-    let SEM: String                  // 학기
-    let ALL_TI_YMD: String           // YYYYMMDD (수업일자)
-    let GRADE: String                // 학년
-    let CLASS_NM: String             // 반
-    let PERIO: String                // 교시
-    let ITRT_CNTNT: String           // 과목명
-    let CLRM_NM: String?             // 교실명 (있을 경우)
-    let LOAD_DTM: String?            // 수정일
+    let date: String            // YYYYMMDD (수업일자)
+    let className: String       // 반
+    let period: String          // 교시
+    let subject: String         // 과목명
+    let room: String?           // 교실명 (있을 경우)
+    let lastUpdated: String?    // 수정일
+
+    enum CodingKeys: String, CodingKey {
+        case date = "ALL_TI_YMD"
+        case className = "CLASS_NM"
+        case period = "PERIO"
+        case subject = "ITRT_CNTNT"
+        case room = "CLRM_NM"
+        case lastUpdated = "LOAD_DTM"
+    }
 }

@@ -1,0 +1,31 @@
+# .swiftlint.yml
+included:
+  - niceTimetable
+  - basicWidget
+
+disabled_rules:
+  # Performance-heavy rules (disable if build time is critical)
+  - file_length
+  - cyclomatic_complexity
+  - todo  # Disable if you use TODO/FIXME comments intentionally
+
+# Essential rules
+opt_in_rules:
+  - empty_count
+  - missing_docs
+  - force_unwrapping
+
+# Customize rule severity
+line_length:
+  warning: 120
+  error: 150
+  ignores_function_declarations: true
+  ignores_urls: true
+
+# Exclude generated files
+excluded:
+  - Carthage
+  - Pods
+  - DerivedData
+  - path: "*.generated.swift"
+  - path: "*.plist"

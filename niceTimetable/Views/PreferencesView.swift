@@ -13,7 +13,7 @@ struct PreferencesView: View {
     @AppStorage("grade", store: .appGroup) private var grade: String = ""
     @AppStorage("className", store: .appGroup) private var className: String = ""
     @AppStorage("daySwitchTime", store: .appGroup) private var daySwitchTime: String = "00:00"
-    
+
     var body: some View {
         List {
             Section {
@@ -37,7 +37,7 @@ struct PreferencesView: View {
                     }
                 }
             }
-            
+
             Section {
                 // Set when to switch days:
                 // After this time of day, the next day is shown by default
@@ -46,7 +46,7 @@ struct PreferencesView: View {
                         .badge("\(self.daySwitchTime != "00:00" ? "\(self.daySwitchTime) 이후" : "끔")")
                 }
             }
-            
+
             Section("정보") {
                 NavigationLink("이 앱에 관하여...") {
                     AboutView()
@@ -113,19 +113,19 @@ struct AboutView: View {
                     AdvancedInfoView()
                 }
             }
-            
+
             Section(header: Text("개발자")) {
                 Text("""
                     이 앱을 만든 사람(들)
                     - lee-jongwoo (jongwoo@jongwoo.dev)
-                    
+
                     아직 저 말고는 목록에 사람이 없네요.
                     이 앱은 오픈 소스로 공개되어 있습니다. 혹시 SwiftUI 개발에 관심이 있으시다면, [GitHub](https://github.com/lee-jongwoo/niceTimetable)에서 niceTimetable 레포지토리를 확인해 보세요. PR 언제나 환영입니다.
                     """)
                 .font(.caption)
                 .foregroundColor(.secondary)
             }
-            
+
             Section(header: Text("라이선스")) {
                 Text("""
                     이 앱은 외부 오픈 소스 라이브러리를 사용하지 않았습니다.
@@ -147,47 +147,47 @@ struct AdvancedInfoView: View {
     @AppStorage("schoolCode", store: .appGroup) private var schoolCode: String = ""
     @AppStorage("grade", store: .appGroup) private var grade: String = ""
     @AppStorage("className", store: .appGroup) private var className: String = ""
-    
+
     var body: some View {
         Form {
             Text("이 설정은 테스트 용도로 만들어 둔 것입니다. 뭐 건드려도 별일 없긴 합니다.")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            
+
             Section(header: Text("학교 정보"), footer: Text("이 설정은 바꾼 다음 자동으로 반영되지 않을 수 있어요. 설정을 완료하면 캐시를 비우고 앱을 재시작해주세요.")) {
                 Picker("학교 유형", selection: $schoolType) {
                     Text("고등학교").tag("고등학교")
                     Text("중학교").tag("중학교")
                 }
-                
+
                 LabeledContent {
                     TextField("교육청 코드", text: $officeCode)
                         .multilineTextAlignment(.trailing)
                 } label: {
                     Text("교육청 코드")
                 }
-                
+
                 LabeledContent {
                     TextField("학교 이름", text: $schoolName)
                         .multilineTextAlignment(.trailing)
                 } label: {
                     Text("학교 이름")
                 }
-                
+
                 LabeledContent {
                     TextField("학교 코드", text: $schoolCode)
                         .multilineTextAlignment(.trailing)
                 } label: {
                     Text("학교 코드")
                 }
-                
+
                 LabeledContent {
                     TextField("학년", text: $grade)
                         .multilineTextAlignment(.trailing)
                 } label: {
                     Text("학년")
                 }
-                
+
                 LabeledContent {
                     TextField("반", text: $className)
                         .multilineTextAlignment(.trailing)
@@ -195,7 +195,7 @@ struct AdvancedInfoView: View {
                     Text("반")
                 }
             }
-            
+
             Section(header: Text("저장공간"), footer: Text("아마도 제 캐시 관리 로직이 알아서 필요없는 캐시를 비우겠지만, 찝찝하시면 수동으로 비우셔도 좋습니다.")) {
                 NavigationLink("과목 별칭...") {
                     AliasEditorView()
@@ -207,7 +207,7 @@ struct AdvancedInfoView: View {
                     CacheManager.shared.clearAll()
                 }
             }
-            
+
             Section(header: Text("위젯"), footer: Text("위젯을 강제로 새로고침합니다.")) {
                 Button("갱신") {
                     CacheManager.shared.reloadWidgets()

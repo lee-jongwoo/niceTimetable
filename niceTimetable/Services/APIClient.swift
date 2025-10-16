@@ -43,12 +43,12 @@ extension NetworkingError: LocalizedError {
 final class NEISAPIClient {
     static let shared = NEISAPIClient()
     private init() {}
-    
+
     /// 원래는 따로 빼서 유출되지 않도록 해야 되는데,
     /// 혹시라도 오픈소스 개발에 참여할 여러분의 수고를 덜기 위해
     /// 걍 냅둡니다. 이걸로 나쁜 짓은 하지 말아 주세요.
     private let apiKey = "cbb9d435b84143d8aed60836da9cc6d3"
-    
+
     // MARK: - School Search
     func searchSchools(for searchText: String, type: String) async throws -> [School] {
         do {
@@ -63,13 +63,13 @@ final class NEISAPIClient {
             guard let url = urlComponents.url else {
                 throw URLError(.badURL)
             }
-            
+
             let (data, response) = try await URLSession.shared.data(from: url)
-            
+
             guard let statusCode = (response as? HTTPURLResponse)?.statusCode, (200...299).contains(statusCode) else {
                 throw NetworkingError.invalidStatusCode(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1)
             }
-            
+
             let decoded = try JSONDecoder().decode(SchoolSearchAPIResponse.self, from: data)
             let rows = decoded.schoolInfo.flatMap { $0.row ?? [] }
             let schools = rows.toSchools()
@@ -86,7 +86,7 @@ final class NEISAPIClient {
             throw NetworkingError.otherError(innerError: error)
         }
     }
-    
+
     // MARK: - Class Fetching
     func fetchClasses(in selectedSchool: School) async throws -> [SchoolClass] {
         do {
@@ -103,13 +103,13 @@ final class NEISAPIClient {
             guard let url = urlComponents.url else {
                 throw URLError(.badURL)
             }
-            
+
             let (data, response) = try await URLSession.shared.data(from: url)
-            
+
             guard let statusCode = (response as? HTTPURLResponse)?.statusCode, (200...299).contains(statusCode) else {
                 throw NetworkingError.invalidStatusCode(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1)
             }
-            
+
             let decoded = try JSONDecoder().decode(ClassListAPIResponse.self, from: data)
             let rows = decoded.classInfo.flatMap { $0.row ?? [] }
             let classes = rows.toClasses()
@@ -126,7 +126,7 @@ final class NEISAPIClient {
             throw NetworkingError.otherError(innerError: error)
         }
     }
-    
+
     // MARK: - Timetable Fetching
     func fetchTimetable(
         schoolType: String,
@@ -141,7 +141,7 @@ final class NEISAPIClient {
             // Format dates (yyyyMMdd)
             let start = DateFormatters.timeStamp.string(from: startDate)
             let end = DateFormatters.timeStamp.string(from: endDate)
-            
+
             // Build query params
             let baseURL = (schoolType == "고등학교") ? "https://open.neis.go.kr/hub/hisTimetable" : "https://open.neis.go.kr/hub/misTimetable"
             var urlComponents = URLComponents(string: baseURL)!
@@ -160,13 +160,13 @@ final class NEISAPIClient {
             guard let url = urlComponents.url else {
                 throw URLError(.badURL)
             }
-            
+
             let (data, response) = try await URLSession.shared.data(from: url)
-            
+
             guard let statusCode = (response as? HTTPURLResponse)?.statusCode, (200...299).contains(statusCode) else {
                 throw NetworkingError.invalidStatusCode(statusCode: (response as? HTTPURLResponse)?.statusCode ?? -1)
             }
-            
+
             let decoded = try JSONDecoder().decode(NEISAPIResponse.self, from: data)
             let rows = decoded.hisTimetable.flatMap { $0.row ?? [] }
             // Map to days
@@ -189,14 +189,14 @@ final class NEISAPIClient {
             throw NetworkingError.otherError(innerError: error)
         }
     }
-    
+
     // MARK: - Batch Fetching
     func fetchCachedWeeklyTable(weekInterval: Int = 0) -> [TimetableDay]? {
         let baseDate = Date().addingTimeInterval(TimeInterval(weekInterval * 7 * 24 * 60 * 60))
         let weekKey = PreferencesManager.shared.startOfWeek(for: baseDate).weekIdentifier()
         return CacheManager.shared.get(for: weekKey, maxAge: 2 * 60 * 60)
     }
-        
+
     func fetchWeeklyTable(
         weekInterval: Int = 0,
         disableCache: Bool = false
@@ -210,16 +210,16 @@ final class NEISAPIClient {
         else {
             throw NetworkingError.badConfiguration
         }
-        
+
         let baseDate = Date().addingTimeInterval(TimeInterval(weekInterval * 7 * 24 * 60 * 60))
         let (startOfWeek, endOfWeek) = PreferencesManager.shared.weekdayTimeFrame(for: baseDate)
-        
+
         // Check cache first
         let weekKey = startOfWeek.weekIdentifier()
         if !disableCache, let cached = CacheManager.shared.get(for: weekKey, maxAge: 2 * 60 * 60) {
             return cached
         }
-        
+
         let result = try await NEISAPIClient.shared.fetchTimetable(
             schoolType: schoolType,
             officeCode: officeCode,
@@ -233,20 +233,20 @@ final class NEISAPIClient {
         CacheManager.shared.set(result, for: weekKey)
         return result
     }
-    
+
     // TODO: This should not rely on the user's calendar settings
     // Fill missing weekdays between start and end with empty TimetableDay entries
     private func padDays(_ days: [TimetableDay], from startDate: Date, to endDate: Date) -> [TimetableDay] {
         let cal = Calendar.current
         let start = cal.startOfDay(for: startDate)
         let end = cal.startOfDay(for: endDate)
-        
+
         // Index existing days by their normalized date
         var byDate: [Date: TimetableDay] = [:]
-        for d in days {
-            byDate[cal.startOfDay(for: d.date)] = d
+        for day in days {
+            byDate[cal.startOfDay(for: day.date)] = day
         }
-        
+
         var result: [TimetableDay] = []
         var cursor = start
         while cursor <= end {
@@ -262,7 +262,7 @@ final class NEISAPIClient {
             guard let next = cal.date(byAdding: .day, value: 1, to: cursor) else { break }
             cursor = next
         }
-        
+
         return result.sorted { $0.date < $1.date }
     }
 }

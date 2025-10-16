@@ -11,7 +11,7 @@ struct AliasEditorView: View {
     @State private var subject: String = ""
     @State private var normalAlias: String = ""
     @State private var compactAlias: String = ""
-    
+
     var body: some View {
         Form {
             Section(header: Text("새 별칭 추가"), footer: Text("시간표의 과목을 탭하면 표시되는 상세 화면에서도 별칭을 편집할 수 있습니다.")) {
@@ -26,7 +26,7 @@ struct AliasEditorView: View {
                     compactAlias = ""
                 }
             }
-            
+
             Section(header: Text("기존 별칭")) {
                 let allAliases = PreferencesManager.shared.aliases.sorted { $0.key < $1.key }
                 ForEach(allAliases, id: \.key) { subject, pair in

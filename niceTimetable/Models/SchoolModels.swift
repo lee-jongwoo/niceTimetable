@@ -15,7 +15,7 @@ struct School: Identifiable, Codable, Equatable {
     let officeCode: String
     let officeName: String
     let address: String
-    
+
     // future-proof for potential addition of middle, elementary school support
     let type: String
 }
@@ -33,13 +33,13 @@ extension Array where Element == SchoolRow {
     func toSchools() -> [School] {
         let rows = self.map { row in
             School(
-                schoolType: row.SCHUL_KND_SC_NM,
-                schoolCode: row.SD_SCHUL_CODE,
-                schoolName: row.SCHUL_NM,
-                officeCode: row.ATPT_OFCDC_SC_CODE,
-                officeName: row.ATPT_OFCDC_SC_NM,
-                address: row.ORG_RDNMA ?? "주소 없음",
-                type: row.SCHUL_KND_SC_NM
+                schoolType: row.schoolType,
+                schoolCode: row.schoolCode,
+                schoolName: row.schoolName,
+                officeCode: row.officeCode,
+                officeName: row.officeName,
+                address: row.address ?? "주소 없음",
+                type: row.schoolType
             )
         }
         // Remove duplicates by schoolCode
@@ -60,8 +60,8 @@ extension Array where Element == ClassRow {
     func toClasses() -> [SchoolClass] {
         let classes = self.map { row in
             SchoolClass(
-                grade: row.GRADE,
-                className: row.CLASS_NM
+                grade: row.grade,
+                className: row.className
             )
         }
         // Remove duplicates by grade+className

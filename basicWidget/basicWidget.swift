@@ -12,7 +12,7 @@ struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(date: Date(), data: TimetableDay.sampleWeek)
     }
-    
+
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
         if let cached = NEISAPIClient.shared.fetchCachedWeeklyTable(weekInterval: 0) {
             let entry = SimpleEntry(date: Date(), data: cached)
@@ -23,7 +23,7 @@ struct Provider: TimelineProvider {
             print("No cache available for snapshot.")
         }
     }
-    
+
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
         let calendar = Calendar.current
         let now = Date()
@@ -32,7 +32,7 @@ struct Provider: TimelineProvider {
         if PreferencesManager.shared.daySwitchTime != (0,0) {
             daySwitchTime = PreferencesManager.shared.daySwitchTimeDate
         }
-        
+
         if let cached = CacheManager.shared.get(for: now.weekIdentifier(), maxAge: 24 * 60 * 60) {
             // Cache exists, use it
             var entries: [SimpleEntry] = []
@@ -66,7 +66,7 @@ struct Provider: TimelineProvider {
             }
         }
     }
-    
+
     //    func relevances() async -> WidgetRelevances<Void> {
     //        // Generate a list containing the contexts this widget is relevant in.
     //    }
@@ -82,9 +82,9 @@ struct WeeklyWidgetEntryView : View {
     var longestDayCount: Int {
         entry.data.map { $0.columns.count }.max() ?? 0
     }
-    
+
     @Environment(\.widgetFamily) var family
-    
+
     var body: some View {
         switch family {
         case .systemSmall:
@@ -102,9 +102,9 @@ struct DailyWidgetEntryView: View {
     var longestDayCount: Int {
         entry.data.map { $0.columns.count }.max() ?? 0
     }
-    
+
     @Environment(\.widgetFamily) var family
-    
+
     var body: some View {
         switch family {
         case .accessoryInline:
@@ -121,9 +121,9 @@ struct DailyWidgetEntryView: View {
 struct WidgetGridView: View {
     let entry: Provider.Entry
     let itemAspectRatio: CGFloat
-    
+
     var columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 1, alignment: .top), count: 5)
-    
+
     var body: some View {
         LazyVGrid(columns: columns) {
             ForEach(entry.data) { day in
@@ -148,7 +148,7 @@ struct ColumnTile: View {
     let column: TimetableColumn
     let itemAspectRatio: CGFloat
     let isToday: Bool
-    
+
     @Environment(\.widgetFamily) var family
     @Environment(\.widgetRenderingMode) var renderingMode
 
@@ -193,7 +193,7 @@ struct ColumnTile: View {
 // MARK: - Accessory Inline
 struct WidgetAccessoryInlineView: View {
     let entry: Provider.Entry
-    
+
     var body: some View {
         HStack {
             if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date) }) {
@@ -217,7 +217,7 @@ struct WidgetAccessoryRectangularView: View {
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter
     }()
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date) }) {
@@ -268,7 +268,7 @@ struct WidgetAccessoryRectangularView: View {
 
 struct WeeklyWidget: Widget {
     let kind: String = "WeeklyWidget"
-    
+
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             WeeklyWidgetEntryView(entry: entry)
@@ -285,7 +285,7 @@ struct WeeklyWidget: Widget {
 
 struct DailyWidget: Widget {
     let kind: String = "DailyWidget"
-    
+
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             DailyWidgetEntryView(entry: entry)

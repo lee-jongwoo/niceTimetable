@@ -16,7 +16,7 @@ import SwiftUI
     var classes: [SchoolClass] = []
     var selectedGrade: String = ""
     var selectedClass: String = ""
-    
+
     func performSearch() async {
         guard !searchText.isEmpty else {
             schools = []
@@ -32,22 +32,22 @@ import SwiftUI
             schools = []
         }
     }
-    
+
     var isComplete: Bool {
         selectedSchool != nil && selectedGrade != "" && selectedClass != ""
     }
-    
+
     func selectSchool(_ school: School) {
         self.selectedSchool = school
         self.classes = []
         self.selectedGrade = ""
         self.selectedClass = ""
-        
+
         Task {
             self.classes = try await NEISAPIClient.shared.fetchClasses(in: school)
         }
     }
-    
+
     func saveSchoolInfo() {
         guard let selectedSchool else { return }
         guard selectedGrade != "", selectedClass != "" else { return }

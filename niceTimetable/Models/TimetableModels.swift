@@ -14,12 +14,12 @@ struct TimetableColumn: Identifiable, Codable, Equatable {
     let subject: String
     let room: String?
     let lastUpdated: String?
-    
+
     // Use the normal alias if not blank, otherwise original subject
     var displayName: String {
         PreferencesManager.shared.aliases[subject]?.normal.isEmpty == false ? PreferencesManager.shared.aliases[subject]!.normal : subject
     }
-    
+
     // Use the compact alias if not blank, otherwise fallback to the first character of the subject
     var compactDisplayName: String {
         if PreferencesManager.shared.aliases[subject]?.compact.isEmpty == false {
@@ -30,7 +30,7 @@ struct TimetableColumn: Identifiable, Codable, Equatable {
             return subject.firstMeaningfulCharacter.map { String($0) } ?? "-"
         }
     }
-    
+
     static func == (lhs: TimetableColumn, rhs: TimetableColumn) -> Bool {
         return lhs.period == rhs.period &&
         lhs.subject == rhs.subject &&
@@ -50,11 +50,11 @@ struct TimetableDay: Identifiable, Codable, Equatable {
     var id = UUID()
     let date: Date
     var columns: [TimetableColumn]
-    
+
     static func == (lhs: TimetableDay, rhs: TimetableDay) -> Bool {
         return lhs.date == rhs.date && lhs.columns == rhs.columns
     }
-    
+
     // dummy data for testing
     static let startOfWeek = PreferencesManager.shared.startOfWeek(for: Date())
     static let sampleWeek: [TimetableDay] = [
@@ -67,7 +67,7 @@ struct TimetableDay: Identifiable, Codable, Equatable {
                 TimetableColumn(period: 4, subject: "역사", room: "404", lastUpdated: "20231001"),
                 TimetableColumn(period: 5, subject: "체육", room: "505", lastUpdated: "20231001"),
                 TimetableColumn(period: 6, subject: "역사", room: "404", lastUpdated: "20231001"),
-                TimetableColumn(period: 7, subject: "체육", room: "505", lastUpdated: "20231001"),
+                TimetableColumn(period: 7, subject: "체육", room: "505", lastUpdated: "20231001")
             ]),
         TimetableDay(
             date: startOfWeek.next(.tuesday),
@@ -77,7 +77,7 @@ struct TimetableDay: Identifiable, Codable, Equatable {
                 TimetableColumn(period: 3, subject: "음악", room: "303", lastUpdated: "20231001"),
                 TimetableColumn(period: 4, subject: "미술", room: "404", lastUpdated: "20231001"),
                 TimetableColumn(period: 5, subject: "체육", room: "505", lastUpdated: "20231001"),
-                TimetableColumn(period: 6, subject: "미술", room: "404", lastUpdated: "20231001"),
+                TimetableColumn(period: 6, subject: "미술", room: "404", lastUpdated: "20231001")
             ]),
         TimetableDay(
             date: startOfWeek.next(.wednesday),
@@ -88,7 +88,7 @@ struct TimetableDay: Identifiable, Codable, Equatable {
                 TimetableColumn(period: 4, subject: "미술", room: "404", lastUpdated: "20231001"),
                 TimetableColumn(period: 5, subject: "체육", room: "505", lastUpdated: "20231001"),
                 TimetableColumn(period: 6, subject: "미술", room: "404", lastUpdated: "20231001"),
-                TimetableColumn(period: 7, subject: "체육", room: "505", lastUpdated: "20231001"),
+                TimetableColumn(period: 7, subject: "체육", room: "505", lastUpdated: "20231001")
             ]),
         TimetableDay(
             date: startOfWeek.next(.thursday),
@@ -98,7 +98,7 @@ struct TimetableDay: Identifiable, Codable, Equatable {
                 TimetableColumn(period: 3, subject: "음악", room: "303", lastUpdated: "20231001"),
                 TimetableColumn(period: 4, subject: "미술", room: "404", lastUpdated: "20231001"),
                 TimetableColumn(period: 5, subject: "체육", room: "505", lastUpdated: "20231001"),
-                TimetableColumn(period: 6, subject: "미술", room: "404", lastUpdated: "20231001"),
+                TimetableColumn(period: 6, subject: "미술", room: "404", lastUpdated: "20231001")
             ]),
         TimetableDay(
             date: startOfWeek.next(.friday),
@@ -109,8 +109,8 @@ struct TimetableDay: Identifiable, Codable, Equatable {
                 TimetableColumn(period: 4, subject: "미술", room: "404", lastUpdated: "20231001"),
                 TimetableColumn(period: 5, subject: "체육", room: "505", lastUpdated: "20231001"),
                 TimetableColumn(period: 6, subject: "미술", room: "404", lastUpdated: "20231001"),
-                TimetableColumn(period: 7, subject: "체육", room: "505", lastUpdated: "20231001"),
-            ]),
+                TimetableColumn(period: 7, subject: "체육", room: "505", lastUpdated: "20231001")
+            ])
     ]
 }
 
@@ -130,38 +130,38 @@ struct TimetableResponse: Codable {
 extension Array where Element == NEISRow {
     func toTimetableDays() -> [TimetableDay] {
         // Group rows by date
-        let grouped = Dictionary(grouping: self, by: { $0.ALL_TI_YMD })
-        
+        let grouped = Dictionary(grouping: self, by: { $0.date })
+
         return grouped.compactMap { (dateString, rows) in
             // Parse date
             guard let date = DateFormatters.timeStamp.date(from: dateString) else { return nil }
-            
+
             // Convert rows → TimetableColumn while removing duplicates by period
             var dayRowsDict: [Int: TimetableColumn] = [:]
             for row in rows {
-                guard let period = Int(row.PERIO) else { continue }
+                guard let period = Int(row.period) else { continue }
                 if dayRowsDict[period] == nil {
                     dayRowsDict[period] = TimetableColumn(
                         period: period,
-                        subject: row.ITRT_CNTNT,
-                        room: row.CLRM_NM,
-                        lastUpdated: row.LOAD_DTM
+                        subject: row.subject,
+                        room: row.room,
+                        lastUpdated: row.lastUpdated
                     )
                 }
             }
-            
+
             // Determine the max period present that day
             guard let maxPeriod = dayRowsDict.keys.max(), maxPeriod > 0 else {
                 // No valid periods for this date
                 return TimetableDay(date: date, columns: [])
             }
-            
+
             // Build an ordered array 1...maxPeriod, padding missing periods with empty placeholders
-            let paddedColumns: [TimetableColumn] = (1...maxPeriod).map { p in
-                if let existing = dayRowsDict[p] { return existing }
-                return TimetableColumn(period: p, subject: "", room: nil, lastUpdated: nil)
+            let paddedColumns: [TimetableColumn] = (1...maxPeriod).map { period in
+                if let existing = dayRowsDict[period] { return existing }
+                return TimetableColumn(period: period, subject: "", room: nil, lastUpdated: nil)
             }
-            
+
             return TimetableDay(date: date, columns: paddedColumns)
         }
         .sorted(by: { $0.date < $1.date })

@@ -11,14 +11,14 @@ import StoreKit
 struct TimetableDetailsView: View {
     @EnvironmentObject var aliasStore: AliasStore
     let column: TimetableColumn
-    
+
     @State private var aliasLong: String = ""
     @State private var aliasShort: String = ""
     @State private var currentDetent: PresentationDetent = .medium
     @Environment(\.dismiss) private var dismiss
     @AppStorage("aliasSetCount") private var aliasSetCount: Int = 0
     @Environment(\.requestReview) private var requestReview
-    
+
     var body: some View {
         NavigationStack {
             List {
@@ -30,15 +30,19 @@ struct TimetableDetailsView: View {
                         }
                     })
                 }
-                
+
                 Section(header: Text("이니셜"), footer: Text("작은 화면에서는 별칭 대신 한 글자의 이니셜이 사용됩니다.")) {
-                    TextField(String(aliasLong.firstMeaningfulCharacter.map { String($0) } ?? column.subject.firstMeaningfulCharacter.map { String($0) } ?? ""), text: $aliasShort, onEditingChanged: { began in
-                        if began {
-                            currentDetent = .large
+                    TextField(
+                        String(aliasLong.firstMeaningfulCharacter.map { String($0) } ?? column.subject.firstMeaningfulCharacter.map { String($0) } ?? ""),
+                        text: $aliasShort,
+                        onEditingChanged: { began in
+                            if began {
+                                currentDetent = .large
+                            }
                         }
-                    })
+                    )
                 }
-                
+
                 Section(header: Text("상세 정보")) {
                     LabeledContent("교시", value: "\(column.period)교시")
                     LabeledContent("과목명", value: column.subject)
@@ -55,10 +59,14 @@ struct TimetableDetailsView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("저장", systemImage: "checkmark") {
-                        aliasStore.setAlias(for: column.subject, normal: aliasLong, compact: String(aliasShort.prefix(1)))
+                        aliasStore.setAlias(
+                            for: column.subject,
+                            normal: aliasLong,
+                            compact: String(aliasShort.prefix(1))
+                        )
                         aliasSetCount += 1
                         dismiss()
-                        
+
                         if aliasSetCount == 5 {
                             requestReview()
                         }
@@ -66,7 +74,7 @@ struct TimetableDetailsView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(aliasLong == aliasStore.aliases[column.subject]?.normal ?? "" && aliasShort == aliasStore.aliases[column.subject]?.compact ?? "")
                 }
-                
+
                 ToolbarItem(placement: .cancellationAction) {
                     Button("취소", systemImage: "xmark") {
                         dismiss()
