@@ -101,4 +101,11 @@ final class CacheManager {
     func reloadWidgets() {
         WidgetCenter.shared.reloadAllTimelines()
     }
+    
+    func reloadWidgetsIfNeeded() {
+        if PreferencesManager.shared.shouldUpdateWidget {
+            CacheManager.shared.reloadWidgets()
+            PreferencesManager.shared.shouldUpdateWidget = false
+        }
+    }
 }

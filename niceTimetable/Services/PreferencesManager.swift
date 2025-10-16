@@ -163,6 +163,15 @@ final class PreferencesManager {
         }
     }
     
+    var daySwitchTimeDate: Date {
+        let calendar = Calendar.current
+        var components = calendar.dateComponents([.year, .month, .day], from: Date())
+        components.hour = daySwitchTime.hour
+        components.minute = daySwitchTime.minute
+        components.second = 0
+        return calendar.date(from: components) ?? Date()
+    }
+    
     var daySwitchTimeLabel: String {
         return defaults.string(forKey: Keys.daySwitchTime) ?? "끔"
     }

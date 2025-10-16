@@ -57,6 +57,7 @@ class TimetableViewModel: ObservableObject {
                     // only if current week is updated
                     if weekInterval == 0 {
                         CacheManager.shared.reloadWidgets()
+                        PreferencesManager.shared.shouldUpdateWidget = false
                     }
                 }
             } else {

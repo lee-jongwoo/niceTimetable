@@ -27,9 +27,7 @@ struct RootView: View {
             TimetableView()
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .background {
-                        if PreferencesManager.shared.shouldUpdateWidget {
-                            CacheManager.shared.reloadWidgets()
-                        }
+                        CacheManager.shared.reloadWidgetsIfNeeded()
                     }
                 }
         }

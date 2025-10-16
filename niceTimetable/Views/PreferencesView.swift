@@ -12,7 +12,7 @@ struct PreferencesView: View {
     @AppStorage("schoolName", store: .appGroup) private var schoolName: String = ""
     @AppStorage("grade", store: .appGroup) private var grade: String = ""
     @AppStorage("className", store: .appGroup) private var className: String = ""
-    @AppStorage("daySwitchTime", store: .appGroup) private var daySwitchTime: String = ""
+    @AppStorage("daySwitchTime", store: .appGroup) private var daySwitchTime: String = "00:00"
     
     var body: some View {
         List {
@@ -211,6 +211,7 @@ struct AdvancedInfoView: View {
             Section(header: Text("위젯"), footer: Text("위젯을 강제로 새로고침합니다.")) {
                 Button("갱신") {
                     CacheManager.shared.reloadWidgets()
+                    PreferencesManager.shared.shouldUpdateWidget = false
                 }
             }
         }

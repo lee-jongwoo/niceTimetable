@@ -25,15 +25,23 @@ struct Provider: TimelineProvider {
     }
     
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        let now = Date()
         let calendar = Calendar.current
+        let now = Date()
+        let midnight = calendar.startOfDay(for: now.addingTimeInterval(86400))
+        var daySwitchTime: Date? = nil
+        if PreferencesManager.shared.daySwitchTime != (0,0) {
+            daySwitchTime = PreferencesManager.shared.daySwitchTimeDate
+        }
         
         if let cached = CacheManager.shared.get(for: now.weekIdentifier(), maxAge: 24 * 60 * 60) {
             // Cache exists, use it
-            let midnight = calendar.startOfDay(for: now.addingTimeInterval(86400))
-            let currentEntry = SimpleEntry(date: now, data: cached)
-            let midnightEntry = SimpleEntry(date: midnight, data: cached)
-            let timeline = Timeline(entries: [currentEntry, midnightEntry], policy: .atEnd)
+            var entries: [SimpleEntry] = []
+            entries.append(SimpleEntry(date: now, data: cached))
+            if let switchTime = daySwitchTime, now < switchTime {
+                entries.append(SimpleEntry(date: switchTime, data: cached))
+            }
+            entries.append(SimpleEntry(date: midnight, data: cached))
+            let timeline = Timeline(entries: entries, policy: .atEnd)
             completion(timeline)
         } else {
             // No cache, fetch new data
@@ -41,12 +49,14 @@ struct Provider: TimelineProvider {
                 do {
                     let days = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 0, disableCache: true)
                     CacheManager.shared.set(days, for: now.weekIdentifier())
-                    let midnight = calendar.startOfDay(for: now.addingTimeInterval(86400))
-                    let entries = [
-                        SimpleEntry(date: now, data: days),
-                        SimpleEntry(date: midnight, data: days)
-                    ]
-                    completion(Timeline(entries: entries, policy: .atEnd))
+                    var entries: [SimpleEntry] = []
+                    entries.append(SimpleEntry(date: now, data: days))
+                    if let switchTime = daySwitchTime, now < switchTime {
+                        entries.append(SimpleEntry(date: switchTime, data: days))
+                    }
+                    entries.append(SimpleEntry(date: midnight, data: days))
+                    let timeline = Timeline(entries: entries, policy: .atEnd)
+                    completion(timeline)
                 } catch {
                     print("Error from widget timeline fetch: \(error.localizedDescription)")
                     let fallback = SimpleEntry(date: now, data: [])
@@ -214,7 +224,10 @@ struct WidgetAccessoryInlineView: View {
     
     var body: some View {
         HStack {
-            if let today = entry.data.first(where: { Calendar.current.isDateInToday($0.date) }) {
+            if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date) }) {
+                if !Calendar.current.isDateInToday(today.date) {
+                    Image(systemName: "arrow.right.circle.dotted")
+                }
                 Text(today.columns.map({ $0.compactDisplayName }).joined(separator: "·"))
             } else {
                 Text("수업 없음")
@@ -235,9 +248,21 @@ struct WidgetAccessoryRectangularView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            if let today = entry.data.first(where: { Calendar.current.isDateInToday($0.date) }) {
-                Text(dateFormatter.string(from: today.date))
-                    .font(.caption)
+            if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date) }) {
+                HStack {
+                    Text(dateFormatter.string(from: today.date))
+                        .font(.caption)
+                    if !Calendar.current.isDateInToday(today.date) {
+                        Text("내일")
+                            .font(.caption)
+                            .widgetAccentable()
+                            .background {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(.ultraThinMaterial)
+                            }
+                    }
+                    Spacer()
+                }
                 HStack(spacing: 2) {
                     ForEach(today.columns) { column in
                         Circle()
