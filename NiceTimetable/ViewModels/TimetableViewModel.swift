@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import TipKit
 
 @MainActor
 class TimetableViewModel: ObservableObject {
@@ -106,5 +107,6 @@ class TimetableViewModel: ObservableObject {
                 self.errorMessages[newWeekOffset] = "추가 요청 실패(\(newWeekOffset)): \(error.localizedDescription)"
             }
         }
+        await SwipeTip.didSwipe.donate()
     }
 }

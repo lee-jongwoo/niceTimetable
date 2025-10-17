@@ -122,7 +122,7 @@ struct WidgetGridView: View {
     let entry: Provider.Entry
     let itemAspectRatio: CGFloat
 
-    var columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 1, alignment: .top), count: 5)
+    var columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 0, alignment: .top), count: 5)
 
     var body: some View {
         LazyVGrid(columns: columns) {
@@ -138,9 +138,11 @@ struct WidgetGridView: View {
                 }
                 .mask {
                     RoundedRectangle(cornerRadius: 5)
+                        .padding(.horizontal, 1)
                 }
             }
         }
+        .padding(.horizontal, -1)
         .mask {
             ContainerRelativeShape()
         }
@@ -157,7 +159,7 @@ struct ColumnTile: View {
     @Environment(\.widgetRenderingMode) var renderingMode
 
     var body: some View {
-        RoundedRectangle(cornerRadius: 0)
+        Rectangle()
             .fill(fillColor)
             .aspectRatio(itemAspectRatio, contentMode: .fit)
             .overlay {

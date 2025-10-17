@@ -6,12 +6,29 @@
 //
 
 import SwiftUI
+import TipKit
 
 @main
 struct NiceTimetableApp: App {
+    static let timetableAppDidOpen = Tips.Event(id: "timetableAppDidOpen")
     var body: some Scene {
         WindowGroup {
             RootView()
+                .onAppear { Self.timetableAppDidOpen.sendDonation() }
+        }
+    }
+
+    init() {
+        do {
+            #if DEBUG
+            try Tips.resetDatastore()
+            #endif
+
+            try Tips.configure([
+                .displayFrequency(.hourly)
+            ])
+        } catch {
+            print("Failed to configure TipKit: \(error)")
         }
     }
 }

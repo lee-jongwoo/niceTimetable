@@ -7,6 +7,7 @@
 
 import SwiftUI
 import StoreKit
+import TipKit
 
 struct TimetableDetailsView: View {
     @EnvironmentObject var aliasStore: AliasStore
@@ -73,6 +74,7 @@ struct TimetableDetailsView: View {
                             compact: String(aliasShort.prefix(1))
                         )
                         aliasSetCount += 1
+                        AliasTip.didSetAlias.sendDonation()
                         dismiss()
 
                         if aliasSetCount == 5 {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TipKit
 
 struct TimetableView: View {
     @StateObject private var model = TimetableViewModel()
@@ -23,6 +24,7 @@ struct TimetableView: View {
                     .font(.largeTitle)
                     .bold()
                     .padding()
+
                 ScrollView(.horizontal) {
                     LazyHStack(spacing: 0) {
                         ForEach(-5...3, id: \.self) { offset in
@@ -79,10 +81,9 @@ struct TimetableView: View {
                 .scrollTargetBehavior(.paging)
                 .scrollIndicators(.hidden)
                 .scrollPosition(id: $model.currentWeekIndex, anchor: .center)
-
-                Spacer()
             }
             .ignoresSafeArea(edges: .bottom)
+            //            .navigationTitle("시간표")
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     NavigationLink(destination: PreferencesView()) {
@@ -117,6 +118,9 @@ struct TimetableView: View {
                         await model.loadThreeWeeks()
                     }
                 }
+                #if DEBUG
+                Tips.showAllTipsForTesting()
+                #endif
             }
             .onChange(of: model.currentWeekIndex) { _, newValue in
                 if let newValue {
@@ -144,10 +148,13 @@ struct TimetableGridView: View {
     var columns: [GridItem] = Array(repeating: .init(.flexible(), alignment: .top), count: 5)
     @Binding var selectedItem: TimetableColumn?
 
+    let aliasTip = AliasTip()
+    let swipeTip = SwipeTip()
+
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns) {
-                ForEach(week.days) { day in
+                ForEach(Array(zip(week.days.indices, week.days)), id: \.0) { offset, day in
                     VStack {
                         Text(DateFormatters.monthDay.string(from: day.date))
                             .font(.footnote)
@@ -159,6 +166,12 @@ struct TimetableGridView: View {
                                 dayLength: day.columns.count,
                                 selectedItem: $selectedItem
                             )
+                            .if(week.weekInterval == 0 && offset == 2 && column.period == 1) { view in
+                                view.popoverTip(aliasTip)
+                            }
+                            .if(week.weekInterval == 0 && offset == 4 && column.period == 3) { view in
+                                view.popoverTip(swipeTip, arrowEdge: .trailing)
+                            }
                         }
                     }
                 }
@@ -213,6 +226,21 @@ struct TimetableItemView: View {
                             .padding(3)
                     }
             }
+        }
+    }
+}
+
+// MARK: - Simple view extension for conditional modifier
+extension View {
+    @ViewBuilder
+    func `if`<Content: View>(
+        _ condition: Bool,
+        transform: (Self) -> Content
+    ) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
         }
     }
 }

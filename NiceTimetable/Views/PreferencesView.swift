@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TipKit
 
 struct PreferencesView: View {
     @State var showingSchoolSearch = false
@@ -212,6 +213,12 @@ struct AdvancedInfoView: View {
                 Button("갱신") {
                     CacheManager.shared.reloadWidgets()
                     PreferencesManager.shared.shouldUpdateWidget = false
+                }
+            }
+
+            Section(header: Text("팁")) {
+                Button("재설정") {
+                    try? Tips.resetDatastore()
                 }
             }
         }
