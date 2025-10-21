@@ -44,26 +44,26 @@ final class PreferencesManager {
     }
 
     // May change start time of day in the future
-    func isToday(_ date: Date) -> Bool {
-        if daySwitchTime != (0, 0) {
-            // if day switch time is past, consider it next day
-            let now = Date()
-            let calendar = Calendar.current
-            var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: now)
-            components.hour = daySwitchTime.hour
-            components.minute = daySwitchTime.minute
-            components.second = 0
-            let switchTimeToday = calendar.date(from: components)!
-            if now >= switchTimeToday {
-                // consider it next day
-                let tomorrow = calendar.date(byAdding: .day, value: 1, to: now)!
-                return calendar.isDate(tomorrow, inSameDayAs: date)
-            } else {
-                return calendar.isDate(now, inSameDayAs: date)
-            }
-        } else {
-            return Calendar.current.isDateInToday(date)
+    func isToday(_ date: Date, referenceDate: Date = Date()) -> Bool {
+        let calendar = Calendar.current
+
+        guard daySwitchTime != (0, 0) else {
+            return calendar.isDate(date, inSameDayAs: referenceDate)
         }
+
+        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: referenceDate)
+        components.hour = daySwitchTime.hour
+        components.minute = daySwitchTime.minute
+        components.second = 0
+
+        guard let switchTimeToday = calendar.date(from: components),
+              let nextDay = calendar.date(byAdding: .day, value: 1, to: referenceDate)
+        else {
+            return false
+        }
+
+        let effectiveDay = referenceDate >= switchTimeToday ? nextDay : referenceDate
+        return calendar.isDate(effectiveDay, inSameDayAs: date)
     }
 
     // MARK: - Subject Aliases

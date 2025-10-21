@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import NiceTimetable
 
 struct APITests {
@@ -25,4 +26,15 @@ struct APITests {
         let weeklyTable: [TimetableDay] = try await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 0, disableCache: true)
         #expect(weeklyTable.isEmpty == false)
     }
+}
+
+struct DateHandling {
+
+    @Test func isToday() {
+        let today = Date()
+        let notToday = Calendar.current.date(byAdding: .day, value: -1, to: today)!
+        #expect (PreferencesManager.shared.isToday(today) == true)
+        #expect (PreferencesManager.shared.isToday(notToday) == false)
+    }
+
 }

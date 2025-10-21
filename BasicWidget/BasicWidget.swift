@@ -40,8 +40,7 @@ struct Provider: TimelineProvider {
             if let switchTime = daySwitchTime, now < switchTime {
                 entries.append(SimpleEntry(date: switchTime, data: cached))
             }
-            entries.append(SimpleEntry(date: midnight, data: cached))
-            let timeline = Timeline(entries: entries, policy: .atEnd)
+            let timeline = Timeline(entries: entries, policy: .after(midnight))
             completion(timeline)
         } else {
             // No cache, fetch new data
@@ -54,8 +53,7 @@ struct Provider: TimelineProvider {
                     if let switchTime = daySwitchTime, now < switchTime {
                         entries.append(SimpleEntry(date: switchTime, data: days))
                     }
-                    entries.append(SimpleEntry(date: midnight, data: days))
-                    let timeline = Timeline(entries: entries, policy: .atEnd)
+                    let timeline = Timeline(entries: entries, policy: .after(midnight))
                     completion(timeline)
                 } catch {
                     print("Error from widget timeline fetch: \(error.localizedDescription)")
@@ -132,7 +130,7 @@ struct WidgetGridView: View {
                         ColumnTile(
                             column: column,
                             itemAspectRatio: itemAspectRatio,
-                            isToday: PreferencesManager.shared.isToday(day.date)
+                            isToday: PreferencesManager.shared.isToday(day.date, referenceDate: entry.date)
                         )
                     }
                 }
@@ -146,6 +144,14 @@ struct WidgetGridView: View {
         .mask {
             ContainerRelativeShape()
         }
+        #if DEBUG
+        .overlay {
+            Text(entry.date.formatted(date: .numeric, time: .standard))
+                .background {
+                    Color.yellow
+                }
+        }
+        #endif
     }
 }
 
@@ -201,7 +207,7 @@ struct WidgetAccessoryInlineView: View {
 
     var body: some View {
         HStack {
-            if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date) }) {
+            if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date, referenceDate: entry.date) }) {
                 if !Calendar.current.isDateInToday(today.date) {
                     Image(systemName: "arrow.right.circle.dotted")
                 }
@@ -225,7 +231,7 @@ struct WidgetAccessoryRectangularView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date) }) {
+            if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date, referenceDate: entry.date) }) {
                 HStack {
                     Text(dateFormatter.string(from: today.date))
                         .font(.caption)

@@ -52,7 +52,7 @@ final class NEISAPIClient {
     // MARK: - School Search
     func searchSchools(for searchText: String, type: String) async throws -> [School] {
         do {
-            var urlComponents = URLComponents(string: "https://open.neis.go.kr/hub/schoolInfo")!
+            var urlComponents = URLComponents(string: "https://open.neis.go.kr/hub/schoolInfo")!    // swiftlint:disable:this force_unwrapping
             let parameters: [String: String] = [
                 "KEY": apiKey,
                 "Type": "json",
@@ -91,7 +91,7 @@ final class NEISAPIClient {
     func fetchClasses(in selectedSchool: School) async throws -> [SchoolClass] {
         do {
             let academicYear = String(Calendar.current.component(.year, from: Date()))
-            var urlComponents = URLComponents(string: "https://open.neis.go.kr/hub/classInfo")!
+            var urlComponents = URLComponents(string: "https://open.neis.go.kr/hub/classInfo")! // swiftlint:disable:this force_unwrapping
             let parameters: [String: String] = [
                 "KEY": apiKey,
                 "Type": "json",
@@ -144,7 +144,7 @@ final class NEISAPIClient {
 
             // Build query params
             let baseURL = (schoolType == "고등학교") ? "https://open.neis.go.kr/hub/hisTimetable" : "https://open.neis.go.kr/hub/misTimetable"
-            var urlComponents = URLComponents(string: baseURL)!
+            var urlComponents = URLComponents(string: baseURL)! // swiftlint:disable:this force_unwrapping
             let parameters: [String: String] = [
                 "KEY": apiKey,
                 "Type": "json",
@@ -194,7 +194,7 @@ final class NEISAPIClient {
     func fetchCachedWeeklyTable(weekInterval: Int = 0) -> [TimetableDay]? {
         let baseDate = Date().addingTimeInterval(TimeInterval(weekInterval * 7 * 24 * 60 * 60))
         let weekKey = PreferencesManager.shared.startOfWeek(for: baseDate).weekIdentifier()
-        return CacheManager.shared.get(for: weekKey, maxAge: 2 * 60 * 60)
+        return CacheManager.shared.get(for: weekKey)
     }
 
     func fetchWeeklyTable(
@@ -216,7 +216,7 @@ final class NEISAPIClient {
 
         // Check cache first
         let weekKey = startOfWeek.weekIdentifier()
-        if !disableCache, let cached = CacheManager.shared.get(for: weekKey, maxAge: 2 * 60 * 60) {
+        if !disableCache, let cached = CacheManager.shared.get(for: weekKey, maxAge: 24 * 60 * 60) {
             return cached
         }
 

@@ -42,14 +42,18 @@ final class CacheManager {
         return "cachedSchedule_\(identifier)"
     }
 
-    func get(for identifier: String, maxAge: TimeInterval) -> [TimetableDay]? {
+    func get(for identifier: String, maxAge: TimeInterval? = nil) -> [TimetableDay]? {
         guard let data = defaults.data(forKey: cacheKey(for: identifier)),
               let cached = try? JSONDecoder().decode(CachedSchedule.self, from: data) else { return nil }
 
-        if Date().timeIntervalSince(cached.timestamp) < maxAge {
-            return cached.currentWeek
+        if let maxAge = maxAge {
+            if Date().timeIntervalSince(cached.timestamp) < maxAge {
+                return cached.currentWeek
+            } else {
+                return nil
+            }
         } else {
-            return nil
+            return cached.currentWeek
         }
     }
 
@@ -75,12 +79,10 @@ final class CacheManager {
             }
         }
 
-        for key in allKeys {
-            if key.hasPrefix("cachedSchedule_") {
-                let identifier = String(key.dropFirst("cachedSchedule_".count))
-                if !validIdentifiers.contains(identifier) {
-                    defaults.removeObject(forKey: key)
-                }
+        for key in allKeys where key.hasPrefix("cachedSchedule_") {
+            let identifier = String(key.dropFirst("cachedSchedule_".count))
+            if !validIdentifiers.contains(identifier) {
+                defaults.removeObject(forKey: key)
             }
         }
     }
