@@ -45,7 +45,7 @@ final class PreferencesManager {
 
     // May change start time of day in the future
     func isToday(_ date: Date) -> Bool {
-        if daySwitchTime != (0,0) {
+        if daySwitchTime != (0, 0) {
             // if day switch time is past, consider it next day
             let now = Date()
             let calendar = Calendar.current

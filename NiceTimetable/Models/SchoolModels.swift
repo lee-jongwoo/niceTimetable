@@ -15,9 +15,6 @@ struct School: Identifiable, Codable, Equatable {
     let officeCode: String
     let officeName: String
     let address: String
-
-    // future-proof for potential addition of middle, elementary school support
-    let type: String
 }
 
 struct SchoolClass: Identifiable, Codable {
@@ -38,8 +35,7 @@ extension Array where Element == SchoolRow {
                 schoolName: row.schoolName,
                 officeCode: row.officeCode,
                 officeName: row.officeName,
-                address: row.address ?? "주소 없음",
-                type: row.schoolType
+                address: row.address ?? "주소 없음"
             )
         }
         // Remove duplicates by schoolCode

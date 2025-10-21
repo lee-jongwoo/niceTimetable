@@ -118,9 +118,6 @@ struct TimetableView: View {
                         await model.loadThreeWeeks()
                     }
                 }
-                #if DEBUG
-                Tips.showAllTipsForTesting()
-                #endif
             }
             .onChange(of: model.currentWeekIndex) { _, newValue in
                 if let newValue {
