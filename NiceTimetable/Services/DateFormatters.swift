@@ -34,7 +34,7 @@ extension Date {
 }
 
 extension Date {
-    public func next(_ weekday: Weekday,
+    func next(_ weekday: Weekday,
                      direction: Calendar.SearchDirection = .forward,
                      considerToday: Bool = true) -> Date
     {
@@ -53,7 +53,7 @@ extension Date {
                                  direction: direction)!
     }
 
-    public enum Weekday: Int {
+    enum Weekday: Int {
         case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
     }
 }

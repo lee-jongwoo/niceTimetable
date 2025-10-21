@@ -92,6 +92,7 @@ struct DateChangeTimeView: View {
                                 PreferencesManager.shared.daySwitchTime = daySwitchTime
                                 print("Set day switch time to \(daySwitchTime.hour):\(daySwitchTime.minute)")
                                 PreferencesManager.shared.shouldUpdateWidget = true
+                                DaySwitchNotifier.shared.refresh()
                             }
                         }
                     ), displayedComponents: .hourAndMinute)

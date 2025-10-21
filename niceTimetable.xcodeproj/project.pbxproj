@@ -85,6 +85,7 @@
 				Services/APIClient.swift,
 				Services/CacheManager.swift,
 				Services/DateFormatters.swift,
+				Services/DaySwitchNotifier.swift,
 				Services/PreferencesManager.swift,
 			);
 			target = 01C150AC2E8C003B00D61252 /* BasicWidgetExtension */;

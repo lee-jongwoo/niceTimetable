@@ -7,6 +7,7 @@
 
 import SwiftUI
 import TipKit
+import Combine
 
 struct TimetableView: View {
     @StateObject private var model = TimetableViewModel()
@@ -15,6 +16,12 @@ struct TimetableView: View {
     var viewModes = ["작게", "크게"]
     @AppStorage("viewMode") private var viewMode: String = "작게"
     @State var selectedItem: TimetableColumn?
+    @State var now: Date = Date()
+
+    init() {
+        // Without this, DaySwitchNotifier might not get initialized early enough to post notifications on day switch.
+        _ = DaySwitchNotifier.shared
+    }
 
     var body: some View {
         NavigationStack {
@@ -29,7 +36,7 @@ struct TimetableView: View {
                     LazyHStack(spacing: 0) {
                         ForEach(-5...3, id: \.self) { offset in
                             if let week = model.weeks[offset] {
-                                TimetableGridView(week: week, selectedItem: $selectedItem)
+                                TimetableGridView(week: week, selectedItem: $selectedItem, now: $now)
                                     .environmentObject(aliasStore)
                                     .id(offset)
                                     .containerRelativeFrame(.horizontal, count: 1, spacing: 0)
@@ -126,6 +133,11 @@ struct TimetableView: View {
                     }
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .dayDidSwitch)) { _ in
+                withAnimation {
+                    now = Date()
+                }
+            }
             .task {
                 await model.checkForUpdates() // Fetch for updated data
                 model.clearOldCache()   // Remove old cache
@@ -144,6 +156,7 @@ struct TimetableGridView: View {
     let week: TimetableWeek
     var columns: [GridItem] = Array(repeating: .init(.flexible(), alignment: .top), count: 5)
     @Binding var selectedItem: TimetableColumn?
+    @Binding var now: Date
 
     let aliasTip = AliasTip()
     let swipeTip = SwipeTip()
@@ -152,6 +165,8 @@ struct TimetableGridView: View {
         ScrollView {
             LazyVGrid(columns: columns) {
                 ForEach(Array(zip(week.days.indices, week.days)), id: \.0) { offset, day in
+                    let isToday = PreferencesManager.shared.isToday(day.date, referenceDate: now)
+
                     VStack {
                         Text(DateFormatters.monthDay.string(from: day.date))
                             .font(.footnote)
@@ -159,7 +174,7 @@ struct TimetableGridView: View {
                         ForEach(day.columns) { column in
                             TimetableItemView(
                                 column: column,
-                                isToday: PreferencesManager.shared.isToday(day.date),
+                                isToday: isToday,
                                 dayLength: day.columns.count,
                                 selectedItem: $selectedItem
                             )

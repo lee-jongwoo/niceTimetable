@@ -92,10 +92,8 @@ final class CacheManager {
     }
 
     func clearAll() {
-        for key in defaults.dictionaryRepresentation().keys {
-            if key.hasPrefix("cachedSchedule_") {
-                defaults.removeObject(forKey: key)
-            }
+        for key in defaults.dictionaryRepresentation().keys where key.hasPrefix("cachedSchedule_") {
+            defaults.removeObject(forKey: key)
         }
         reloadWidgets()
     }
