@@ -121,9 +121,12 @@ struct TimetableView: View {
             }
             .onAppear {
                 if model.weeks.isEmpty {
+                    model.loadCurrentWeekFromCache()
                     Task {
                         await model.loadThreeWeeks()
                     }
+                    model.clearOldCache()   // Remove old cache
+                    CacheManager.shared.reloadWidgetsIfNeeded() // Reload widgets if needed
                 }
             }
             .onChange(of: model.currentWeekIndex) { _, newValue in
@@ -137,11 +140,6 @@ struct TimetableView: View {
                 withAnimation {
                     now = Date()
                 }
-            }
-            .task {
-                await model.checkForUpdates() // Fetch for updated data
-                model.clearOldCache()   // Remove old cache
-                CacheManager.shared.reloadWidgetsIfNeeded() // Reload widgets if needed
             }
             .sheet(item: $selectedItem) { item in
                 TimetableDetailsView(column: item)

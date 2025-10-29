@@ -18,10 +18,17 @@ class TimetableViewModel: ObservableObject {
     @Published var currentWeekIndex: Int? = 0    // Track which week is currently displayed
     @Published var loadedWeekIndices: [Int] = [] // Track which weeks have been loaded
 
+    func loadCurrentWeekFromCache() {
+        guard let cachedDays = NEISAPIClient.shared.fetchCachedWeeklyTable() else { return }
+        let currentWeek = TimetableWeek(days: cachedDays, weekInterval: 0)
+        self.weeks[0] = currentWeek
+        self.loadedWeekIndices = [0]
+    }
+
     func loadThreeWeeks() async {
         // Load previous, current, and next week
         async let lastWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: -1)
-        async let thisWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 0)
+        async let thisWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 0, disableCache: true)
         async let nextWeek = try? await NEISAPIClient.shared.fetchWeeklyTable(weekInterval: 1)
 
         let results = await [lastWeek, thisWeek, nextWeek]
@@ -75,7 +82,7 @@ class TimetableViewModel: ObservableObject {
     }
 
     func clearOldCache() {
-        CacheManager.shared.pruneOldWeeks(keeping: -1...1)
+        CacheManager.shared.pruneOldWeeks(keeping: -1...2)
     }
 
     func handleWeekChange(to newIndex: Int) async {

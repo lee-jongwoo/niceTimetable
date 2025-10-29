@@ -199,7 +199,8 @@ final class NEISAPIClient {
 
     func fetchWeeklyTable(
         weekInterval: Int = 0,
-        disableCache: Bool = false
+        disableCache: Bool = false,
+        maxAge: TimeInterval? = 2 * 24 * 60 * 60
     ) async throws -> [TimetableDay] {
         guard
             let schoolType = PreferencesManager.shared.schoolType,
@@ -216,7 +217,7 @@ final class NEISAPIClient {
 
         // Check cache first
         let weekKey = startOfWeek.weekIdentifier()
-        if !disableCache, let cached = CacheManager.shared.get(for: weekKey, maxAge: 2 * 24 * 60 * 60) {
+        if !disableCache, let cached = CacheManager.shared.get(for: weekKey, maxAge: maxAge) {
             return cached
         }
 
