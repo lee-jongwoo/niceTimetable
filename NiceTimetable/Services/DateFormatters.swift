@@ -34,16 +34,16 @@ extension Date {
 }
 
 extension Date {
-    func next(_ weekday: Weekday,
-                     direction: Calendar.SearchDirection = .forward,
-                     considerToday: Bool = true) -> Date
-    {
+    func next(
+        _ weekday: Weekday,
+        direction: Calendar.SearchDirection = .forward,
+        considerToday: Bool = true
+    ) -> Date {
         let calendar = Calendar(identifier: .gregorian)
         let components = DateComponents(weekday: weekday.rawValue)
 
         if considerToday &&
-            calendar.component(.weekday, from: self) == weekday.rawValue
-        {
+            calendar.component(.weekday, from: self) == weekday.rawValue {
             return self
         }
 

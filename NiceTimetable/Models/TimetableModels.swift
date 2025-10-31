@@ -89,12 +89,12 @@ struct TimetableDay: Identifiable, Codable, Equatable {
             date: startOfWeek.next(.wednesday),
             columns: [
                 TimetableColumn(period: 1, subject: "국어", room: "101", lastUpdated: "20231001"),
-                TimetableColumn(period: 2, subject: "영어", room: "202", lastUpdated: "20231001"),
-                TimetableColumn(period: 3, subject: "음악", room: "303", lastUpdated: "20231001"),
-                TimetableColumn(period: 4, subject: "미술", room: "404", lastUpdated: "20231001"),
-                TimetableColumn(period: 5, subject: "체육", room: "505", lastUpdated: "20231001"),
-                TimetableColumn(period: 6, subject: "미술", room: "404", lastUpdated: "20231001"),
-                TimetableColumn(period: 7, subject: "체육", room: "505", lastUpdated: "20231001")
+                TimetableColumn(period: 2, subject: "한국사", room: "202", lastUpdated: "20231001"),
+                TimetableColumn(period: 3, subject: "과학탐구", room: "303", lastUpdated: "20231001"),
+                TimetableColumn(period: 4, subject: "윤리와 사상", room: "404", lastUpdated: "20231001"),
+                TimetableColumn(period: 5, subject: "지구과학1", room: "505", lastUpdated: "20231001"),
+                TimetableColumn(period: 6, subject: "정보와 디지털 문해력", room: "404", lastUpdated: "20231001"),
+                TimetableColumn(period: 7, subject: "수능 예비소집일", room: "505", lastUpdated: "20231001")
             ]),
         TimetableDay(
             date: startOfWeek.next(.thursday),

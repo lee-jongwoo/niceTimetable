@@ -88,7 +88,7 @@ struct WeeklyWidgetEntryView: View {
         case .systemSmall:
             WidgetGridView(entry: entry, itemAspectRatio: CGFloat(longestDayCount) / 5.0)
         case .systemMedium:
-            WidgetGridView(entry: entry, itemAspectRatio: CGFloat(longestDayCount) / 2)
+            WidgetGridView(entry: entry, itemAspectRatio: CGFloat(longestDayCount) / 2.1)
         default:
             Text("Not supported")
         }
@@ -105,6 +105,8 @@ struct DailyWidgetEntryView: View {
 
     var body: some View {
         switch family {
+        case .systemMedium:
+            WidgetDailyView(entry: entry)
         case .accessoryInline:
             WidgetAccessoryInlineView(entry: entry)
         case .accessoryRectangular:
@@ -145,12 +147,12 @@ struct WidgetGridView: View {
             ContainerRelativeShape()
         }
         #if DEBUG
-        .overlay {
-            Text(entry.date.formatted(date: .numeric, time: .standard))
-                .background {
-                    Color.yellow
-                }
-        }
+//        .overlay {
+//            Text(entry.date.formatted(date: .numeric, time: .standard))
+//                .background {
+//                    Color.yellow
+//                }
+//        }
         #endif
     }
 }
@@ -172,7 +174,8 @@ struct ColumnTile: View {
                 Text(family == .systemMedium ? column.displayName : column.compactDisplayName)
                     .foregroundStyle(textColor)
                     .fontWeight(fontWeight)
-                    .minimumScaleFactor(0.5)
+                    .minimumScaleFactor(0.6)
+                    .padding(.horizontal, 2)
             }
     }
 
@@ -182,13 +185,13 @@ struct ColumnTile: View {
         case (true, .fullColor), (true, .vibrant):
             return Color("AccentColor")
         case (true, _):
-            return .clear
+            return .gray.opacity(0.2)
         case (false, .fullColor):
             return .gray.opacity(0.1)
         case (false, .vibrant):
             return .gray.opacity(0.2)
         default:
-            return .clear
+            return .gray.opacity(0.05)
         }
     }
 
@@ -201,13 +204,85 @@ struct ColumnTile: View {
     }
 }
 
+// MARK: - Home Screen Daily
+struct WidgetDailyView: View {
+    let entry: Provider.Entry
+    let rows: [GridItem] = Array(repeating: .init(.flexible(), spacing: 0, alignment: .leading), count: 2)
+
+    var body: some View {
+        GeometryReader { geo in
+            VStack {
+                if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date, referenceDate: entry.date) }) {
+                    TwoColumnFillingLayout(spacing: 3, columnSpacing: 10) {
+                        CurrentDateView(date: today.date, showTomorrowLabel: !Calendar.current.isDateInToday(today.date))
+
+                        ForEach(today.columns) { column in
+                            HStack(spacing: 4) {
+                                RoundedRectangle(cornerRadius: 1.5)
+                                    .fill(Color("AccentColor"))
+                                    .frame(width: 3)
+                                Text(column.displayName)
+                                    .font(.callout)
+                                    .lineLimit(1)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                                .padding(3)
+                                .background {
+                                    RoundedRectangle(cornerRadius: 5)
+                                        .fill(.gray.opacity(0.05))
+                                }
+                        }
+//                        ForEach(1...7, id: \.self) { num in
+//                            Text("\(num)")
+//                        }
+                    }
+                } else {
+                    CurrentDateView(date: entry.date, showTomorrowLabel: false)
+                    Spacer()
+                    Text("오늘은 수업이 없습니다.")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+        }
+    }
+}
+
+struct CurrentDateView: View {
+    let date: Date
+    let showTomorrowLabel: Bool
+
+    var body: some View {
+        HStack(alignment: .bottom) {
+            Text(date, format: .dateTime.day(.defaultDigits).weekday(.narrow))
+                .font(.title)
+
+            if showTomorrowLabel {
+                Text("내일")
+                    .font(.caption)
+                    .padding(2)
+                    .widgetAccentable()
+                    .background {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(.gray.opacity(0.2))
+                    }
+            }
+
+            Spacer()
+        }
+    }
+}
+
 // MARK: - Accessory Inline
 struct WidgetAccessoryInlineView: View {
     let entry: Provider.Entry
 
     var body: some View {
         HStack {
-            if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date, referenceDate: entry.date) }) {
+            if let today = entry.data.first(where: {
+                PreferencesManager.shared.isToday($0.date, referenceDate: entry.date)
+            }) {
                 if !Calendar.current.isDateInToday(today.date) {
                     Image(systemName: "arrow.right.circle.dotted")
                 }
@@ -231,7 +306,9 @@ struct WidgetAccessoryRectangularView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            if let today = entry.data.first(where: { PreferencesManager.shared.isToday($0.date, referenceDate: entry.date) }) {
+            if let today = entry.data.first(where: {
+                PreferencesManager.shared.isToday($0.date, referenceDate: entry.date)
+            }) {
                 HStack {
                     Text(dateFormatter.string(from: today.date))
                         .font(.caption)
@@ -303,6 +380,7 @@ struct DailyWidget: Widget {
         .configurationDisplayName("일간 시간표")
         .description("오늘의 시간표를 확인합니다.")
         .supportedFamilies([
+            .systemMedium,
             .accessoryInline,
             .accessoryRectangular
         ])
@@ -318,6 +396,9 @@ struct Widget_Previews: PreviewProvider {
             WeeklyWidgetEntryView(entry: SimpleEntry(date: Date(), data: TimetableDay.sampleWeek))
                 .previewContext(WidgetPreviewContext(family: .systemMedium))
                 .previewDisplayName("Medium")
+            DailyWidgetEntryView(entry: SimpleEntry(date: Date(), data: TimetableDay.sampleWeek))
+                .previewContext(WidgetPreviewContext(family: .systemMedium))
+                .previewDisplayName("Daily Medium")
             DailyWidgetEntryView(entry: SimpleEntry(date: Date(), data: TimetableDay.sampleWeek))
                 .previewContext(WidgetPreviewContext(family: .accessoryInline))
                 .previewDisplayName("Inline")
