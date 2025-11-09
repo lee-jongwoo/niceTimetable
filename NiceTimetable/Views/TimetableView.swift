@@ -43,6 +43,8 @@ struct TimetableView: View {
                                     .refreshable {
                                         await model.checkForUpdates(weekInterval: model.currentWeekIndex ?? 0)
                                     }
+                                    .accessibilityElement(children: .contain)
+                                    .accessibilitySortPriority(offset>=0 ? Double(5-offset) : 0)
                             } else if let errorMsg = model.errorMessages[offset] {
                                 VStack {
                                     if errorMsg == "tableNotRegistered" {
@@ -96,6 +98,7 @@ struct TimetableView: View {
                     NavigationLink(destination: PreferencesView()) {
                         Image(systemName: "gearshape")
                     }
+                    .accessibilityLabel("설정")
                 }
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Menu {
@@ -106,6 +109,7 @@ struct TimetableView: View {
                     } label: {
                         Image(systemName: "square.grid.2x2")
                     }
+                    .accessibilityLabel("보기 옵션")
                 }
                 ToolbarItemGroup(placement: .bottomBar) {
                     if model.currentWeekIndex != 0 {
@@ -166,8 +170,9 @@ struct TimetableGridView: View {
                     let isToday = PreferencesManager.shared.isToday(day.date, referenceDate: now)
 
                     VStack {
-                        Text(DateFormatters.monthDay.string(from: day.date))
+                        Text(day.date, formatter: DateFormatters.monthDay)
                             .font(.footnote)
+                            .accessibilityLabel(DateFormatters.fullDate.string(from: day.date))
 
                         ForEach(day.columns) { column in
                             TimetableItemView(
@@ -184,6 +189,7 @@ struct TimetableGridView: View {
                             }
                         }
                     }
+                    .accessibilityElement(children: .contain)
                 }
             }
             .frame(maxWidth: 500)
@@ -238,6 +244,7 @@ struct TimetableItemView: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(column.period)교시, \(displayName)")
     }
 }
 

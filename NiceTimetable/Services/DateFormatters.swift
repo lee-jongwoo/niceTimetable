@@ -15,6 +15,12 @@ struct DateFormatters {
         return formatter
     }()
 
+    static let fullDate: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        return formatter
+    }()
+
     static let timeStamp: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd"
