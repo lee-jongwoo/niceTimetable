@@ -28,7 +28,7 @@ struct TwoColumnFillingLayout: Layout {
             let size = subview.sizeThatFits(.init(width: columnWidth, height: nil))
 
             // Check if adding this would overflow the column height
-            if yOffsets[currentColumn] + size.height + spacing > bounds.minY + totalHeight, currentColumn == 0 {
+            if yOffsets[currentColumn] + size.height > bounds.minY + totalHeight, currentColumn == 0 {
                 currentColumn = 1 // switch to next column
             }
 

@@ -102,6 +102,7 @@ final class PreferencesManager {
         var current = aliasData
         current.removeValue(forKey: subject)
         aliasData = current
+        shouldUpdateWidget = true
     }
 
     // MARK: - School Info

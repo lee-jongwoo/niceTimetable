@@ -237,6 +237,7 @@ struct TimetableItemView: View {
                     }
             }
         }
+        .buttonStyle(.plain)
     }
 }
 

@@ -21,11 +21,13 @@ struct TimetableDetailsView: View {
     @Environment(\.requestReview) private var requestReview
 
     var initialHint: String {
-        String(aliasLong.firstMeaningfulCharacter.map { String($0) } ?? column.subject.firstMeaningfulCharacter.map { String($0) } ?? "")
+        String(aliasLong.firstMeaningfulCharacter.map { String($0) } ??
+               column.subject.firstMeaningfulCharacter.map { String($0) } ?? "")
     }
 
     var isUnchanged: Bool {
-        aliasLong == aliasStore.aliases[column.subject]?.normal ?? "" && aliasShort == aliasStore.aliases[column.subject]?.compact ?? ""
+        aliasLong == aliasStore.aliases[column.subject]?.normal ?? ""
+        && aliasShort == aliasStore.aliases[column.subject]?.compact ?? ""
     }
 
     var body: some View {

@@ -20,9 +20,9 @@ struct NiceTimetableApp: App {
 
     init() {
         do {
-            #if DEBUG
+#if DEBUG
             try Tips.resetDatastore()
-            #endif
+#endif
 
             try Tips.configure([
                 .displayFrequency(.hourly)
@@ -45,6 +45,8 @@ struct RootView: View {
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .background {
                         CacheManager.shared.reloadWidgetsIfNeeded()
+                    } else if newPhase == .active {
+                        DaySwitchNotifier.shared.refresh()
                     }
                 }
         }

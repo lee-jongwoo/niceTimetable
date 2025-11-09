@@ -146,14 +146,14 @@ struct WidgetGridView: View {
         .mask {
             ContainerRelativeShape()
         }
-        #if DEBUG
-//        .overlay {
-//            Text(entry.date.formatted(date: .numeric, time: .standard))
-//                .background {
-//                    Color.yellow
-//                }
-//        }
-        #endif
+#if DEBUG
+        //        .overlay {
+        //            Text(entry.date.formatted(date: .numeric, time: .standard))
+        //                .background {
+        //                    Color.yellow
+        //                }
+        //        }
+#endif
     }
 }
 
@@ -226,15 +226,12 @@ struct WidgetDailyView: View {
                                     .lineLimit(1)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                                .padding(3)
-                                .background {
-                                    RoundedRectangle(cornerRadius: 5)
-                                        .fill(.gray.opacity(0.05))
-                                }
+                            .padding(3)
+                            .background {
+                                RoundedRectangle(cornerRadius: 5)
+                                    .fill(.gray.opacity(0.05))
+                            }
                         }
-//                        ForEach(1...7, id: \.self) { num in
-//                            Text("\(num)")
-//                        }
                     }
                 } else {
                     CurrentDateView(date: entry.date, showTomorrowLabel: false)
@@ -256,7 +253,7 @@ struct CurrentDateView: View {
     var body: some View {
         HStack(alignment: .bottom) {
             Text(date, format: .dateTime.day(.defaultDigits).weekday(.narrow))
-                .font(.title)
+                .font(.title2)
 
             if showTomorrowLabel {
                 Text("내일")
